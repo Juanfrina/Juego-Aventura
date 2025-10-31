@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <!-- Configuración básica del documento HTML5 -->
+    <meta charset="UTF-8">
+    <!-- Para que se vea bien en móviles - diseño responsive -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Enlazamos nuestro CSS para que el juego se vea bonito -->
+    <link rel="stylesheet" type="text/css" media="screen" href="estilos/styles.css">
+    <!-- Cargamos el JavaScript principal como módulo ES6 - defer hace que se ejecute después de cargar el HTML -->
+    <script type="module" src="main.js" defer></script>
+    <title>Aventura-Reino</title>
+</head>
+
+<body>
+    <!-- Cabecera del juego - siempre visible arriba -->
+    <header>
+        <h1>Bienvenido a la Aventura del Reino</h1>
+    </header>
+    
+    <!-- Contenedor principal donde están todas las escenas del juego -->
+    <main>
+        <!-- ESCENA 1: Pantalla inicial donde el jugador ve sus stats iniciales -->
+        <!-- Solo una escena está activa a la vez - las demás están ocultas -->
+        <div id="scene1" class="scene active">
+            <div class="escena-container">
+                <!-- Sección del jugador: avatar + campo para cambiar nombre -->
+                <div class="jugador-section">
+                    <div class="avatar-container">
+                        <!-- Imagen del héroe que representa al jugador -->
+                        <img src="imagenes/heroe.jpg" alt="Avatar">
+                    </div>
+                    <div class="nombre-container">
+                        <label for="player-name">Nombre del jugador:</label>
+                        <!-- Input editable para que el jugador personalice su nombre -->
+                        <input type="text" value="Nombre" id="player-name">
+                    </div>
+                </div>
+                
+                <!-- Grid de estadísticas del jugador - se actualiza dinámicamente desde JS -->
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <label>Puntos:</label>
+                        <!-- Los puntos se ganan al vencer enemigos -->
+                        <span id="puntos">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <label>Vida:</label>
+                        <!-- Vida fija en 100 - no se consume en este juego -->
+                        <span id="vida">100</span>
+                    </div>
+                    <div class="stat-box">
+                        <label>Ataque:</label>
+                        <!-- Se calcula sumando el ataque de todas las armas compradas -->
+                        <span id="ataque">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <label>Defensa:</label>
+                        <!-- Se calcula sumando la defensa de todas las armaduras compradas -->
+                        <span id="defensa">0</span>
+                    </div>
+                </div>
+                
+                <!-- Botón para avanzar a la siguiente escena - usa eventos onclick -->
+                <button class="continuar-btn" onclick="showScene('scene2')">Continuar</button>
+            </div>
+        </div>
+
+        <!-- ESCENA 2: El mercado donde el jugador compra objetos -->
+        <!-- Esta escena empieza oculta (sin clase "active") -->
+        <div id="scene2" class="scene">
+            <div class="mercado-header">
+                <p class="mercado-subtitle">En el mercado, encuentra la oferta de los equipos y la ayuda especializada mientras en estos eventos.</p>
+                <h2>MERCADO</h2>
+            </div>
+            
+            <!-- Grid de productos que se llena dinámicamente desde JavaScript -->
+            <!-- Muestra 9 productos aleatorios de los 24 disponibles -->
+            <div class="productos-grid" id="productos-grid">
+                <!-- Los productos se generarán dinámicamente -->
+            </div>
+            
+            <!-- Carrito de compras - muestra lo que el jugador ha seleccionado -->
+            <div class="carrito-seleccion" id="carrito-seleccion">
+                <h3>Productos Seleccionados:</h3>
+                <!-- Lista dinámica de productos seleccionados -->
+                <div id="productos-seleccionados">Ningún producto seleccionado</div>
+                <!-- Precio total que se calcula automáticamente -->
+                <div class="total-carrito">Total: <span id="total-precio">0€</span></div>
+            </div>
+            
+            <div class="botones-mercado">
+                <!-- Botón deshabilitado hasta que se seleccione algo -->
+                <button class="comprar-btn" id="comprar-btn" disabled onclick="buyItems()">Confirmar Compra</button>
+                <!-- Botón para avanzar sin comprar nada -->
+                <button class="continuar-btn" onclick="showScene('scene3')">Continuar</button>
+            </div>
+        </div>
+
+        <!-- ESCENA 3: Resumen post-compra - muestra cómo quedó el jugador después del mercado -->
+        <div id="scene3" class="scene">
+            <h2>Estado Actual del Jugador</h2>
+            <div class="player-status">
+                <!-- Información principal del jugador con avatar grande -->
+                <div class="player-info-complete">
+                    <div class="player-avatar-large">
+                        <img src="imagenes/heroe.jpg" alt="Avatar" id="player-avatar-scene3">
+                    </div>
+                    <div class="player-details">
+                        <!-- Nombre actualizado desde la escena 1 -->
+                        <h3 id="player-name-scene3">Jugador</h3>
+                        <!-- Stats recalculadas incluyendo objetos comprados -->
+                        <div class="stats-complete">
+                            <div class="stat-complete">
+                                <span class="stat-label">Puntos:</span>
+                                <span class="stat-value" id="puntos-scene3">0</span>
+                            </div>
+                            <div class="stat-complete">
+                                <span class="stat-label">Vida:</span>
+                                <span class="stat-value" id="vida-scene3">100/100</span>
+                            </div>
+                            <div class="stat-complete">
+                                <span class="stat-label">Ataque Total:</span>
+                                <!-- Aquí se ve el ataque base + ataque de armas compradas -->
+                                <span class="stat-value" id="ataque-scene3">0</span>
+                            </div>
+                            <div class="stat-complete">
+                                <span class="stat-label">Defensa Total:</span>
+                                <!-- Aquí se ve la defensa base + defensa de armaduras compradas -->
+                                <span class="stat-value" id="defensa-scene3">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Lista detallada de lo que se compró en el mercado -->
+                <div class="purchased-items">
+                    <h3>Objetos Comprados:</h3>
+                    <!-- Se llena dinámicamente con los objetos del inventario -->
+                    <div id="items-comprados">No se han comprado objetos</div>
+                </div>
+            </div>
+            <button class="continuar-btn" onclick="showScene('scene4')">Continuar a Enemigos</button>
+        </div>
+
+        <!-- ESCENA 4: Galería de enemigos - para que el jugador vea a qué se enfrenta -->
+        <div id="scene4" class="scene">
+            <h2>Enemigos del Reino</h2>
+            <!-- Grid que se llena con los 3 enemigos normales + 1 jefe final -->
+            <div class="enemies-grid" id="enemies-grid">
+                <!-- Los enemigos se generarán dinámicamente con sus imágenes y stats -->
+            </div>
+            <button class="continuar-btn" onclick="showScene('scene5')">Comenzar Batallas</button>
+        </div>
+
+        <!-- ESCENA 5: El corazón del juego - sistema de combate por turnos -->
+        <div id="scene5" class="scene">
+            <h2>Arena de Combate</h2>
+            <div class="battle-arena">
+                <!-- Información de la batalla actual -->
+                <div class="battle-info" id="battle-info">
+                    <!-- Título que cambia según la batalla (ej: "Batalla 1: Juan vs Goblin") -->
+                    <h3 id="battle-title">Preparándose para la batalla...</h3>
+                    <!-- Enfrentamiento visual estilo "Jugador VS Enemigo" -->
+                    <div class="battle-participants">
+                        <!-- Lado del jugador (verde) -->
+                        <div class="participant player-side">
+                            <h4 id="battle-player-name">Jugador</h4>
+                            <div class="participant-stats">
+                                <!-- Ataque y defensa calculados con los objetos comprados -->
+                                <span>ATQ: <span id="battle-player-attack">0</span></span>
+                                <span>DEF: <span id="battle-player-defense">0</span></span>
+                            </div>
+                        </div>
+                        <div class="vs-separator">VS</div>
+                        <!-- Lado del enemigo (rojo) -->
+                        <div class="participant enemy-side">
+                            <h4 id="battle-enemy-name">Enemigo</h4>
+                            <div class="participant-stats">
+                                <!-- Stats del enemigo actual -->
+                                <span>ATQ: <span id="battle-enemy-attack">0</span></span>
+                                <span>VIDA: <span id="battle-enemy-health">0</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Resultado de la batalla - aparece después de luchar -->
+                <div class="battle-result hidden" id="battle-result">
+                    <h3 id="result-title">Resultado</h3>
+                    <!-- Mensaje de victoria/derrota -->
+                    <p id="result-description">...</p>
+                    <!-- Puntos ganados (si gana) -->
+                    <p id="result-points">...</p>
+                </div>
+            </div>
+            <!-- Botones de control de batalla - se muestran/ocultan según el estado -->
+            <div class="battle-controls">
+                <!-- Botón principal para iniciar cada batalla -->
+                <button class="battle-btn" id="start-battle-btn" onclick="startBattle()">Iniciar Batalla</button>
+                <!-- Botón para continuar a la siguiente batalla (oculto inicialmente) -->
+                <button class="continuar-btn hidden" id="next-battle-btn" onclick="nextBattle()">Siguiente Batalla</button>
+                <!-- Botón para ir al resultado final (oculto hasta completar todas las batallas) -->
+                <button class="continuar-btn hidden" id="finish-battles-btn" onclick="showScene('scene6')">Ver Resultado Final</button>
+            </div>
+        </div>
+
+        <!-- ESCENA 6: Pantalla final con clasificación y estadísticas -->
+        <div id="scene6" class="scene">
+            <h2>¡Aventura Completada!</h2>
+            <div class="final-result">
+                <!-- Clasificación principal basada en batallas ganadas -->
+                <!-- Cambia de color y texto según el rendimiento -->
+                <div class="final-status" id="final-status">
+                    <!-- "¡ERES UNA MÁQUINA!" / "¡TE QUEDASTE A MEDIAS!" / "¡ERES UN PERDEDOR!" -->
+                    <h3 id="final-classification">Clasificación</h3>
+                    <div class="final-points">
+                        <!-- Total de puntos acumulados durante el juego -->
+                        <span id="final-points-text">0 puntos</span>
+                    </div>
+                </div>
+                <!-- Resumen estadístico de toda la partida -->
+                <div class="final-summary">
+                    <h3>Resumen de la Aventura</h3>
+                    <div id="adventure-summary">
+                        <div class="summary-item">
+                            <span>Batallas ganadas:</span>
+                            <!-- De 4 batallas totales (3 enemigos + 1 jefe) -->
+                            <span id="battles-won">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Objetos obtenidos:</span>
+                            <!-- Contador de objetos comprados en el mercado -->
+                            <span id="items-obtained">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Nivel final:</span>
+                            <!-- PRO / A medias / Perdedor -->
+                            <span id="final-level">Rookie</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Botón para volver a empezar - reinicia todo el juego -->
+            <button class="restart-btn" onclick="restartGame()">Empezar Nueva Aventura</button>
+        </div>
+    </main>
+
+    <!-- Footer fijo con el inventario visual - siempre visible -->
+    <footer>
+        <!-- 6 slots de inventario que se llenan conforme compras objetos -->
+        <div id="inventario-contenedor">
+            <!-- Cada slot muestra la imagen del tipo de objeto (arma/armadura/consumible) -->
+            <div class="item"><img src="" alt="Slot vacío"></div>
+            <div class="item"><img src="" alt="Slot vacío"></div>
+            <div class="item"><img src="" alt="Slot vacío"></div>
+            <div class="item"><img src="" alt="Slot vacío"></div>
+            <div class="item"><img src="" alt="Slot vacío"></div>
+            <div class="item"><img src="" alt="Slot vacío"></div>
+        </div>
+    </footer>
+
+    <!-- Template HTML para generar productos dinámicamente -->
+    <!-- No se muestra en pantalla, solo se usa como molde en JavaScript -->
+    <template id="producto-template">
+        <div class="producto-card" data-producto-id="">
+            <img src="" alt="Producto">
+            <h4 class="producto-nombre"></h4>
+            <div class="producto-info">
+                <!-- Precio original tachado -->
+                <span class="precio-original"></span>
+                <!-- Precio con descuento aplicado -->
+                <span class="precio-descuento"></span>
+            </div>
+            <div class="producto-detalles">
+                <!-- Tipo: arma/armadura/consumible -->
+                <span class="categoria"></span>
+                <!-- Rareza: Común/Raro/Épico/Legendario -->
+                <span class="rareza"></span>
+            </div>
+        </div>
+    </template>
+</body>
+
+</html>
