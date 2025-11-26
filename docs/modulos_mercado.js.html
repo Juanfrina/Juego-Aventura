@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSDoc: Source: modulos/mercado.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: modulos/mercado.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {Producto} from './producto.js';
+
+/**
+ * Clase Mercado
+ * @class
+ * @description Gestiona el mercado de productos del juego con funciones de filtrado y descuentos
+ */
+export class Mercado {
+
+    /**
+     * Lista de todos los productos disponibles en el mercado
+     * @type {Array&lt;Producto>}
+     */
+    listaProductos = [
+        new Producto("Espada Basica", 500, "Comun", "arma", { ataque: 5 }),
+        new Producto("Armadura Ligera", 750, "Raro", "armadura", { defensa: 10 }),
+        new Producto("Pocion de vida", 200, "Comun", "consumible", { curacion: 50 }),
+        new Producto("Granada", 250, "Raro", "consumible", { ataque: 30 }),
+        new Producto("Arco Largo", 1200, "Epico", "arma", { ataque: 15 }),
+        new Producto("Escudo Antiguo", 900, "Epico", "armadura", { defensa: 20 }),
+        new Producto("Pocion de Mana", 300, "Comun", "consumible", { curacion: 40 }),
+        new Producto("Daga Envenenada", 1100, "Legendario", "arma", { ataque: 25 }),
+        new Producto("Armadura de Dragón", 2000, "Legendario", "armadura", { defensa: 35 }),
+        new Producto("Espada de Hierro", 800, "Raro", "arma", { ataque: 12 }),
+        new Producto("Casco de Acero", 600, "Comun", "armadura", { defensa: 8 }),
+        new Producto("Martillo de Guerra", 1500, "Epico", "arma", { ataque: 20 }),
+        new Producto("Hacha Vikinga", 950, "Raro", "arma", { ataque: 14 }),
+        new Producto("Botas de Cuero", 400, "Comun", "armadura", { defensa: 6 }),
+        new Producto("Elixir de Fuerza", 450, "Raro", "consumible", { ataque: 10 }),
+        new Producto("Ballesta Pesada", 1350, "Epico", "arma", { ataque: 18 }),
+        new Producto("Guanteletes de Acero", 550, "Comun", "armadura", { defensa: 7 }),
+        new Producto("Bomba de Humo", 320, "Raro", "consumible", { defensa: 15 }),
+        new Producto("Lanza de Plata", 1100, "Epico", "arma", { ataque: 17 }),
+        new Producto("Armadura Completa", 1800, "Epico", "armadura", { defensa: 25 }),
+        new Producto("Pocion Suprema", 800, "Epico", "consumible", { curacion: 100 }),
+        new Producto("Espada Maldita", 2500, "Legendario", "arma", { ataque: 30 }),
+        new Producto("Escudo Divino", 2200, "Legendario", "armadura", { defensa: 40 }),
+        new Producto("Nectar de Dioses", 1500, "Legendario", "consumible", { curacion: 150 })
+    ];
+
+    /**
+     * Filtra productos por rareza específica
+     * @param {string} rareza - Rareza por la que filtrar (Comun, Raro, Epico, Legendario)
+     * @returns {Array&lt;Producto>} Lista de productos que coinciden con la rareza indicada
+     */
+    filtrarPorRareza(rareza) {
+        return this.listaProductos.filter(producto => producto.rareza === rareza);
+    }
+
+    /**
+     * Aplica un descuento a todos los productos de una rareza específica
+     * @param {string} rareza - Rareza de los productos a los que aplicar descuento
+     * @param {number} porcentaje - Porcentaje de descuento a aplicar (0-100)
+     * @returns {Array&lt;Producto>} Lista de productos con el descuento aplicado a los que coinciden
+     */
+    aplicarDescuento(rareza, porcentaje) {
+        return this.listaProductos.map(producto => producto.rareza === rareza ? producto.aplicarDescuento(porcentaje) : producto);
+    }
+
+    /**
+     * Busca un producto específico por su nombre
+     * @param {string} nombre - Nombre del producto a buscar
+     * @returns {Producto|undefined} Producto que coincide con el nombre o undefined si no se encuentra
+     */
+    buscarProducto(nombre) {
+        return this.listaProductos.find(producto => producto.nombre === nombre);
+    }
+
+    /**
+     * Muestra la descripción de todos los productos disponibles
+     * @returns {Array&lt;string>} Array con las descripciones de todos los productos
+     */
+    mostrarProducto() {
+        return this.listaProductos.map(producto => producto.presentar());
+    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-constants.html">constants</a></li></ul><h3>Classes</h3><ul><li><a href="Enemigos.html">Enemigos</a></li><li><a href="JefeFinal.html">JefeFinal</a></li><li><a href="Jugadores.html">Jugadores</a></li><li><a href="Mercado.html">Mercado</a></li><li><a href="Producto.html">Producto</a></li></ul><h3>Global</h3><ul><li><a href="global.html#EUR">EUR</a></li><li><a href="global.html#actualizarTexto">actualizarTexto</a></li><li><a href="global.html#batalla">batalla</a></li><li><a href="global.html#batallasGanadas">batallasGanadas</a></li><li><a href="global.html#battleBoss">battleBoss</a></li><li><a href="global.html#calcularDescuentoAleatorio">calcularDescuentoAleatorio</a></li><li><a href="global.html#capitalizarPrimeraLetra">capitalizarPrimeraLetra</a></li><li><a href="global.html#categorizePlayers">categorizePlayers</a></li><li><a href="global.html#crearElementoHTML">crearElementoHTML</a></li><li><a href="global.html#createEnemyCard">createEnemyCard</a></li><li><a href="global.html#createProductCard">createProductCard</a></li><li><a href="global.html#enemigoActual">enemigoActual</a></li><li><a href="global.html#enemigos">enemigos</a></li><li><a href="global.html#formatearPrecio">formatearPrecio</a></li><li><a href="global.html#generarPuntosAleatorios">generarPuntosAleatorios</a></li><li><a href="global.html#initializeBattles">initializeBattles</a></li><li><a href="global.html#initializeEnemies">initializeEnemies</a></li><li><a href="global.html#initializeGame">initializeGame</a></li><li><a href="global.html#initializeMarket">initializeMarket</a></li><li><a href="global.html#jefeFinal">jefeFinal</a></li><li><a href="global.html#jugador">jugador</a></li><li><a href="global.html#mercado">mercado</a></li><li><a href="global.html#mezclarArray">mezclarArray</a></li><li><a href="global.html#mostrarRanking">mostrarRanking</a></li><li><a href="global.html#mostrarReporteCompleto">mostrarReporteCompleto</a></li><li><a href="global.html#numeroAleatorio">numeroAleatorio</a></li><li><a href="global.html#objetosComprados">objetosComprados</a></li><li><a href="global.html#obtenerImagenEnemigo">obtenerImagenEnemigo</a></li><li><a href="global.html#obtenerImagenPorTipo">obtenerImagenPorTipo</a></li><li><a href="global.html#productosSeleccionados">productosSeleccionados</a></li><li><a href="global.html#seleccionarAleatorios">seleccionarAleatorios</a></li><li><a href="global.html#setupBattle">setupBattle</a></li><li><a href="global.html#setupBattleBoss">setupBattleBoss</a></li><li><a href="global.html#showBattleResult">showBattleResult</a></li><li><a href="global.html#showFinalResults">showFinalResults</a></li><li><a href="global.html#showScene">showScene</a></li><li><a href="global.html#toggleProductSelection">toggleProductSelection</a></li><li><a href="global.html#toggleVisibilidad">toggleVisibilidad</a></li><li><a href="global.html#updateCart">updateCart</a></li><li><a href="global.html#updateInventoryDisplay">updateInventoryDisplay</a></li><li><a href="global.html#updatePlayerStats">updatePlayerStats</a></li><li><a href="global.html#updateScene3">updateScene3</a></li><li><a href="global.html#validarEnemigo">validarEnemigo</a></li><li><a href="global.html#validarJugador">validarJugador</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Nov 24 2025 12:09:52 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

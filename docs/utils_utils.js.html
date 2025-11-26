@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSDoc: Source: utils/utils.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: utils/utils.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// === NAVEGACIÓN DE ESCENAS ===
+
+/**
+ * Cambia entre diferentes escenas del juego
+ * @param {string} id - ID de la escena a mostrar
+ */
+export function showScene(id) {
+    document.querySelectorAll('.scene').forEach(
+        element => element.classList.remove('active')
+    );
+    document.getElementById(id).classList.add('active');
+}
+
+// === FUNCIONES DE CÁLCULO Y FORMATEO ===
+
+/**
+ * Genera un descuento aleatorio basado en la rareza del producto
+ * @param {string} rareza - Rareza del producto (Comun, Raro, Epico, Legendario)
+ * @returns {number} Porcentaje de descuento
+ */
+export function calcularDescuentoAleatorio(rareza) {
+    const rangos = {
+        'Comun': { min: 5, max: 25 },
+        'Raro': { min: 10, max: 40 },
+        'Epico': { min: 15, max: 55 },
+        'Legendario': { min: 20, max: 70 }
+    };
+    
+    const rango = rangos[rareza] || { min: 0, max: 10 };
+    return Math.floor(Math.random() * (rango.max - rango.min + 1)) + rango.min;
+}
+
+/**
+ * Formatea un precio de céntimos a euros
+ * @param {number} centimos - Precio en céntimos
+ * @returns {string} Precio formateado (ej: "12.50€")
+ */
+export function formatearPrecio(centimos) {
+    return (centimos / 100).toFixed(2) + '€';
+}
+
+/**
+ * Genera puntos aleatorios dentro de un rango
+ * @param {number} min - Valor mínimo
+ * @param {number} max - Valor máximo
+ * @returns {number} Puntos generados
+ */
+export function generarPuntosAleatorios(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// === FUNCIONES DE IMÁGENES ===
+
+/**
+ * Obtiene la ruta de la imagen según el tipo de objeto
+ * @param {string} tipo - Tipo de objeto (arma, armadura, consumible)
+ * @returns {string} Ruta de la imagen
+ */
+export function obtenerImagenPorTipo(tipo) {
+    const imagenes = {
+        'arma': 'imagenes/arma.png',
+        'armadura': 'imagenes/armadura.png',
+        'consumible': 'imagenes/consumible.png'
+    };
+    
+    return imagenes[tipo] || 'imagenes/arma.png';
+}
+
+/**
+ * Obtiene la ruta de la imagen de un enemigo por su nombre
+ * @param {string} nombre - Nombre del enemigo
+ * @returns {string} Ruta de la imagen
+ */
+export function obtenerImagenEnemigo(nombre) {
+    const imagenes = {
+        'goblin': 'imagenes/Goblin.jpg',
+        'orco': 'imagenes/Orco.jpg',
+        'troll': 'imagenes/Troll.jpg',
+        'dragón': 'imagenes/Dragon.jpg',
+        'dragon': 'imagenes/Dragon.jpg'
+    };
+    
+    return imagenes[nombre.toLowerCase()] || 'imagenes/enemigo.jpg';
+}
+
+// === FUNCIONES DE ARRAYS ===
+
+/**
+ * Mezcla un array de forma aleatoria (Fisher-Yates shuffle)
+ * @param {Array} array - Array a mezclar
+ * @returns {Array} Array mezclado (nueva copia)
+ */
+export function mezclarArray(array) {
+    const copia = [...array];
+    for (let i = copia.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copia[i], copia[j]] = [copia[j], copia[i]];
+    }
+    return copia;
+}
+
+/**
+ * Selecciona N elementos aleatorios de un array
+ * @param {Array} array - Array original
+ * @param {number} cantidad - Cantidad de elementos a seleccionar
+ * @returns {Array} Array con elementos seleccionados
+ */
+export function seleccionarAleatorios(array, cantidad) {
+    return mezclarArray(array).slice(0, cantidad);
+}
+
+// === FUNCIONES DE MANIPULACIÓN DEL DOM ===
+
+/**
+ * Crea un elemento HTML con clase y contenido
+ * @param {string} tag - Etiqueta HTML (div, span, etc.)
+ * @param {string} className - Clase CSS
+ * @param {string} content - Contenido HTML o texto
+ * @returns {HTMLElement} Elemento creado
+ */
+export function crearElementoHTML(tag, className = '', content = '') {
+    const elemento = document.createElement(tag);
+    if (className) elemento.className = className;
+    if (content) elemento.innerHTML = content;
+    return elemento;
+}
+
+/**
+ * Actualiza el texto de un elemento por su ID
+ * @param {string} id - ID del elemento
+ * @param {string|number} texto - Texto a mostrar
+ */
+export function actualizarTexto(id, texto) {
+    const elemento = document.getElementById(id);
+    if (elemento) elemento.textContent = texto;
+}
+
+/**
+ * Muestra u oculta un elemento agregando/quitando la clase 'hidden'
+ * @param {string} id - ID del elemento
+ * @param {boolean} ocultar - true para ocultar, false para mostrar
+ */
+export function toggleVisibilidad(id, ocultar) {
+    const elemento = document.getElementById(id);
+    if (elemento) {
+        if (ocultar) {
+            elemento.classList.add('hidden');
+        } else {
+            elemento.classList.remove('hidden');
+        }
+    }
+}
+
+// === FUNCIONES DE VALIDACIÓN ===
+
+/**
+ * Valida que un objeto tenga las propiedades de un jugador
+ * @param {Object} jugador - Objeto a validar
+ * @returns {boolean} true si es válido
+ */
+export function validarJugador(jugador) {
+    return jugador &amp;&amp; 
+           typeof jugador.nombre === 'string' &amp;&amp;
+           typeof jugador.puntos === 'number' &amp;&amp;
+           typeof jugador.vida === 'number' &amp;&amp;
+           Array.isArray(jugador.inventario);
+}
+
+/**
+ * Valida que un objeto tenga las propiedades de un enemigo
+ * @param {Object} enemigo - Objeto a validar
+ * @returns {boolean} true si es válido
+ */
+export function validarEnemigo(enemigo) {
+    return enemigo &amp;&amp; 
+           typeof enemigo.nombre === 'string' &amp;&amp;
+           typeof enemigo.nivelataque === 'number' &amp;&amp;
+           typeof enemigo.puntosvida === 'number';
+}
+
+// === FUNCIONES DE UTILIDAD GENERAL ===
+
+/**
+ * Genera un número aleatorio entre min y max (inclusive)
+ * @param {number} min - Valor mínimo
+ * @param {number} max - Valor máximo
+ * @returns {number} Número aleatorio
+ */
+export function numeroAleatorio(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * Capitaliza la primera letra de un string
+ * @param {string} str - String a capitalizar
+ * @returns {string} String capitalizado
+ */
+export function capitalizarPrimeraLetra(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-constants.html">constants</a></li></ul><h3>Classes</h3><ul><li><a href="Enemigos.html">Enemigos</a></li><li><a href="JefeFinal.html">JefeFinal</a></li><li><a href="Jugadores.html">Jugadores</a></li><li><a href="Mercado.html">Mercado</a></li><li><a href="Producto.html">Producto</a></li></ul><h3>Global</h3><ul><li><a href="global.html#EUR">EUR</a></li><li><a href="global.html#actualizarTexto">actualizarTexto</a></li><li><a href="global.html#batalla">batalla</a></li><li><a href="global.html#batallasGanadas">batallasGanadas</a></li><li><a href="global.html#battleBoss">battleBoss</a></li><li><a href="global.html#calcularDescuentoAleatorio">calcularDescuentoAleatorio</a></li><li><a href="global.html#capitalizarPrimeraLetra">capitalizarPrimeraLetra</a></li><li><a href="global.html#categorizePlayers">categorizePlayers</a></li><li><a href="global.html#crearElementoHTML">crearElementoHTML</a></li><li><a href="global.html#createEnemyCard">createEnemyCard</a></li><li><a href="global.html#createProductCard">createProductCard</a></li><li><a href="global.html#enemigoActual">enemigoActual</a></li><li><a href="global.html#enemigos">enemigos</a></li><li><a href="global.html#formatearPrecio">formatearPrecio</a></li><li><a href="global.html#generarPuntosAleatorios">generarPuntosAleatorios</a></li><li><a href="global.html#initializeBattles">initializeBattles</a></li><li><a href="global.html#initializeEnemies">initializeEnemies</a></li><li><a href="global.html#initializeGame">initializeGame</a></li><li><a href="global.html#initializeMarket">initializeMarket</a></li><li><a href="global.html#jefeFinal">jefeFinal</a></li><li><a href="global.html#jugador">jugador</a></li><li><a href="global.html#mercado">mercado</a></li><li><a href="global.html#mezclarArray">mezclarArray</a></li><li><a href="global.html#mostrarRanking">mostrarRanking</a></li><li><a href="global.html#mostrarReporteCompleto">mostrarReporteCompleto</a></li><li><a href="global.html#numeroAleatorio">numeroAleatorio</a></li><li><a href="global.html#objetosComprados">objetosComprados</a></li><li><a href="global.html#obtenerImagenEnemigo">obtenerImagenEnemigo</a></li><li><a href="global.html#obtenerImagenPorTipo">obtenerImagenPorTipo</a></li><li><a href="global.html#productosSeleccionados">productosSeleccionados</a></li><li><a href="global.html#seleccionarAleatorios">seleccionarAleatorios</a></li><li><a href="global.html#setupBattle">setupBattle</a></li><li><a href="global.html#setupBattleBoss">setupBattleBoss</a></li><li><a href="global.html#showBattleResult">showBattleResult</a></li><li><a href="global.html#showFinalResults">showFinalResults</a></li><li><a href="global.html#showScene">showScene</a></li><li><a href="global.html#toggleProductSelection">toggleProductSelection</a></li><li><a href="global.html#toggleVisibilidad">toggleVisibilidad</a></li><li><a href="global.html#updateCart">updateCart</a></li><li><a href="global.html#updateInventoryDisplay">updateInventoryDisplay</a></li><li><a href="global.html#updatePlayerStats">updatePlayerStats</a></li><li><a href="global.html#updateScene3">updateScene3</a></li><li><a href="global.html#validarEnemigo">validarEnemigo</a></li><li><a href="global.html#validarJugador">validarJugador</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Nov 24 2025 12:09:52 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSDoc: Source: modulos/producto.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: modulos/producto.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Clase Producto
+ * @class
+ * @description Representa un producto del mercado con sus características y bonus
+ */
+export class Producto {
+    nombre;
+    precio;
+    rareza;
+    tipo;
+    bonus;
+
+    /**
+    * Crea un nuevo producto con las propiedades indicadas
+    * @param {string} nombre - Nombre del producto
+    * @param {number} precio - Precio en céntimos (sin decimales)
+    * @param {string} rareza - Rareza del producto (Comun, Raro, Epico, Legendario)
+    * @param {string} tipo - Tipo de producto (arma, armadura, consumible)
+    * @param {Object} bonus - Bonus que otorga el producto
+    * @param {number} [bonus.ataque] - Bonus de ataque (para armas)
+    * @param {number} [bonus.defensa] - Bonus de defensa (para armaduras)
+    * @param {number} [bonus.curacion] - Bonus de curación (para consumibles)
+    */
+    constructor(nombre, precio, rareza, tipo, bonus) {
+        this.nombre = nombre;
+        this.precio = precio;
+        this.rareza = rareza;
+        this.tipo = tipo;
+        this.bonus = bonus;
+    }
+
+    /**
+    * Devuelve una descripción completa del producto
+    * @returns {string} Descripción del producto con todos sus atributos
+    */
+    presentar() {
+        const precioFormateado = this.formatearPrecio();
+        return `El producto ${this.nombre} es de tipo ${this.tipo}, tiene una rareza de ${this.rareza}, un precio de ${precioFormateado} y otorga un bonus de ${JSON.stringify(this.bonus)}.`;
+    }
+
+    /**
+    * Formatea el precio de céntimos a euros
+    * @returns {string} Precio formateado en euros (ejemplo: "9.50€")
+    */
+    formatearPrecio() {
+        return (this.precio / 100).toFixed(2) + "€";
+    }
+
+    /**
+    * Aplica un descuento porcentual al precio del producto
+    * @param {number} porcentaje - Porcentaje de descuento a aplicar (0-100)
+    * @returns {number} Nuevo precio en céntimos tras aplicar el descuento
+    */
+    aplicarDescuento(porcentaje) {
+        if (porcentaje &lt; 0) porcentaje = 0;
+        if (porcentaje > 100) porcentaje = 100;
+
+        const nuevoPrecio = this.precio * (1 - porcentaje / 100);
+        this.precio = Math.round(nuevoPrecio);
+        return this.precio;
+    }
+
+
+}
+
+/**
+ * Formateador de moneda para euros (ES)
+ * @constant {Intl.NumberFormat}
+ */
+export const EUR = new Intl.NumberFormat('es-ES', {
+    style: 'currency'
+    , currency: 'EUR'
+});</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-constants.html">constants</a></li></ul><h3>Classes</h3><ul><li><a href="Enemigos.html">Enemigos</a></li><li><a href="JefeFinal.html">JefeFinal</a></li><li><a href="Jugadores.html">Jugadores</a></li><li><a href="Mercado.html">Mercado</a></li><li><a href="Producto.html">Producto</a></li></ul><h3>Global</h3><ul><li><a href="global.html#EUR">EUR</a></li><li><a href="global.html#actualizarTexto">actualizarTexto</a></li><li><a href="global.html#batalla">batalla</a></li><li><a href="global.html#batallasGanadas">batallasGanadas</a></li><li><a href="global.html#battleBoss">battleBoss</a></li><li><a href="global.html#calcularDescuentoAleatorio">calcularDescuentoAleatorio</a></li><li><a href="global.html#capitalizarPrimeraLetra">capitalizarPrimeraLetra</a></li><li><a href="global.html#categorizePlayers">categorizePlayers</a></li><li><a href="global.html#crearElementoHTML">crearElementoHTML</a></li><li><a href="global.html#createEnemyCard">createEnemyCard</a></li><li><a href="global.html#createProductCard">createProductCard</a></li><li><a href="global.html#enemigoActual">enemigoActual</a></li><li><a href="global.html#enemigos">enemigos</a></li><li><a href="global.html#formatearPrecio">formatearPrecio</a></li><li><a href="global.html#generarPuntosAleatorios">generarPuntosAleatorios</a></li><li><a href="global.html#initializeBattles">initializeBattles</a></li><li><a href="global.html#initializeEnemies">initializeEnemies</a></li><li><a href="global.html#initializeGame">initializeGame</a></li><li><a href="global.html#initializeMarket">initializeMarket</a></li><li><a href="global.html#jefeFinal">jefeFinal</a></li><li><a href="global.html#jugador">jugador</a></li><li><a href="global.html#mercado">mercado</a></li><li><a href="global.html#mezclarArray">mezclarArray</a></li><li><a href="global.html#mostrarRanking">mostrarRanking</a></li><li><a href="global.html#mostrarReporteCompleto">mostrarReporteCompleto</a></li><li><a href="global.html#numeroAleatorio">numeroAleatorio</a></li><li><a href="global.html#objetosComprados">objetosComprados</a></li><li><a href="global.html#obtenerImagenEnemigo">obtenerImagenEnemigo</a></li><li><a href="global.html#obtenerImagenPorTipo">obtenerImagenPorTipo</a></li><li><a href="global.html#productosSeleccionados">productosSeleccionados</a></li><li><a href="global.html#seleccionarAleatorios">seleccionarAleatorios</a></li><li><a href="global.html#setupBattle">setupBattle</a></li><li><a href="global.html#setupBattleBoss">setupBattleBoss</a></li><li><a href="global.html#showBattleResult">showBattleResult</a></li><li><a href="global.html#showFinalResults">showFinalResults</a></li><li><a href="global.html#showScene">showScene</a></li><li><a href="global.html#toggleProductSelection">toggleProductSelection</a></li><li><a href="global.html#toggleVisibilidad">toggleVisibilidad</a></li><li><a href="global.html#updateCart">updateCart</a></li><li><a href="global.html#updateInventoryDisplay">updateInventoryDisplay</a></li><li><a href="global.html#updatePlayerStats">updatePlayerStats</a></li><li><a href="global.html#updateScene3">updateScene3</a></li><li><a href="global.html#validarEnemigo">validarEnemigo</a></li><li><a href="global.html#validarJugador">validarJugador</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Nov 24 2025 12:09:52 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
