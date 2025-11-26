@@ -1,10 +1,63 @@
 /* === ESTILOS BÁSICOS PARA EL JUEGO === */
 
+/* === ANIMACIONES KEYFRAMES === */
+/* Animación de entrada desde la izquierda (jugador) */
+@keyframes slideInFromLeft {
+    0% {
+        transform: translateX(200%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Animación de entrada desde la derecha (enemigo) */
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(-200%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Animación de aparición para icono de carrito */
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
 /* Reset CSS - quitamos márgenes y paddings por defecto del navegador */
 * {
     box-sizing: border-box; /* Para que padding y border se incluyan en el tamaño total */
     margin: 0;
     padding: 0;
+}
+
+/* Prevenir scroll horizontal en todas las pantallas */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Asegurar que las imágenes no se salgan del contenedor */
+img {
+    max-width: 100%;
+    height: auto;
 }
 
 /* Variables CSS - definimos la paleta de colores del juego */
@@ -61,6 +114,7 @@ main {
     border-radius: 15px; /* Bordes redondeados para look moderno */
     padding: 30px;
     text-align: center;
+    box-sizing: border-box; /* Importante para que padding no cause overflow */
 }
 
 /* Solo la escena con clase "active" se muestra */
@@ -201,6 +255,24 @@ main {
 .producto-card.selected {
     background-color: var(--accent-color); /* Verde */
     border-color: #2d8f0f;                 /* Verde más oscuro para el borde */
+}
+
+/* Indicador de añadido al carrito */
+.producto-card .added-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: var(--accent-color);
+    color: white;
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeInOut 2s ease-in-out;
+    pointer-events: none; /* No interfiere con clicks */
 }
 
 .producto-card img {
@@ -361,6 +433,15 @@ footer {
     align-items: center;      /* Centrar imagen verticalmente */
     justify-content: center;  /* Centrar imagen horizontalmente */
     border-radius: 5px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición suave */
+    cursor: pointer;
+}
+
+/* Animación hover: agrandar slot del inventario */
+.item:hover {
+    transform: scale(1.15); /* Aumenta 15% */
+    box-shadow: 0 8px 16px rgba(241, 222, 9, 0.5); /* Sombra dorada */
+    z-index: 10; /* Para que quede encima de los demás */
 }
 
 /* Imágenes dentro de cada slot */
@@ -582,18 +663,49 @@ footer {
     text-align: center;
     padding: 20px;
     border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Contenedor de imagen en la batalla */
+.battle-image-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    margin-bottom: 10px;
+}
+
+.battle-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 /* Lado del jugador - colores verdes (bueno/héroe) */
 .player-side {
     background-color: rgba(69, 211, 22, 0.2);  /* Verde claro de fondo */
     border: 2px solid var(--accent-color);     /* Borde verde */
+    animation: slideInFromRight 0.8s ease-out;  /* Entra desde la izquierda */
+}
+
+.player-side .battle-image-container {
+    border: 3px solid var(--accent-color);
 }
 
 /* Lado del enemigo - colores rojos (malo/peligro) */
 .enemy-side {
     background-color: rgba(255, 68, 68, 0.2);  /* Rojo claro de fondo */
     border: 2px solid #ff4444;                 /* Borde rojo */
+    animation: slideInFromLeft 0.8s ease-out; /* Entra desde la derecha */
+}
+
+.enemy-side .battle-image-container {
+    border: 3px solid #ff4444;
 }
 
 .participant h4 {
@@ -780,101 +892,338 @@ footer {
 }
 
 /* === RESPONSIVE DESIGN === */
-/* Adaptaciones para tablets y pantallas medianas */
-@media (max-width: 768px) {
-    /* En móviles, avatar y nombre se apilan verticalmente */
+/* Mobile First - Optimizado para los tamaños requeridos */
+
+/* ============================================
+   MÓVIL PEQUEÑO: 360px 
+   ============================================ */
+@media (max-width: 360px) {
+    /* Header más compacto */
+    header h1 {
+        font-size: 1.3rem;
+        padding: 10px;
+    }
+    
+    /* Escenas con menos padding */
+    .scene {
+        padding: 15px;
+        margin: 5px;
+    }
+    
+    main {
+        margin: 5px;
+    }
+    
+    /* Avatar más pequeño */
+    .avatar-container {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .player-avatar-large {
+        width: 100px;
+        height: 100px;
+    }
+    
+    /* Jugador: todo vertical */
     .jugador-section {
         flex-direction: column;
+        gap: 10px;
     }
     
-    /* Stats en una sola columna en lugar de 2x2 */
+    /* Stats en una columna */
     .stats-container {
         grid-template-columns: 1fr;
+        gap: 10px;
     }
     
-    /* Mercado pasa de 3x3 a 2 columnas */
-    .productos-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    /* Menos margen en pantallas pequeñas */
-    main {
-        margin: 10px;
-    }
-    
-    /* Menos padding en las escenas */
-    .scene {
-        padding: 20px;
-    }
-    
-    /* Inventario se adapta mejor, puede hacer wrap */
-    #inventario-contenedor {
-        margin: 8px 10%;  /* Márgenes más pequeños */
-        flex-wrap: wrap;  /* Los slots pueden saltar de línea */
-    }
-    
-    /* Botones del mercado se apilan verticalmente */
-    .botones-mercado {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    /* Info del jugador se apila en lugar de lado a lado */
-    .player-info-complete {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    /* Stats completas en una columna */
     .stats-complete {
         grid-template-columns: 1fr;
     }
     
-    /* Batalla: jugador arriba, enemigo abajo en lugar de lado a lado */
+    /* Productos en 1 columna */
+    .productos-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .producto-card {
+        padding: 12px;
+    }
+    
+    /* Inventario más compacto */
+    #inventario-contenedor {
+        margin: 5px;
+        padding: 5px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .item {
+        width: 70px;
+        height: 60px;
+    }
+    
+    /* Enemigos en 1 columna */
+    .enemies-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    /* Batalla vertical */
+    .battle-participants {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .vs-separator {
+        font-size: 1.2rem;
+        margin: 5px 0;
+    }
+    
+    .battle-image-container {
+        width: 90px;
+        height: 90px;
+    }
+    
+    /* Botones más compactos */
+    .botones-mercado,
+    .battle-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .continuar-btn,
+    .comprar-btn,
+    .battle-btn,
+    .restart-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+    }
+    
+    /* Info del jugador vertical */
+    .player-info-complete {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    /* Resultado final */
+    .final-status {
+        min-width: auto;
+        width: 100%;
+        padding: 15px;
+    }
+    
+    .final-classification {
+        font-size: 1.3rem;
+    }
+}
+
+/* ============================================
+   TABLET: 361px - 720px
+   ============================================ */
+@media (min-width: 361px) and (max-width: 720px) {
+    /* Header normal */
+    header h1 {
+        font-size: 1.6rem;
+    }
+    
+    /* Escenas con padding medio */
+    .scene {
+        padding: 20px;
+    }
+    
+    main {
+        margin: 10px;
+    }
+    
+    /* Avatar tamaño medio */
+    .avatar-container {
+        width: 90px;
+        height: 90px;
+    }
+    
+    /* Jugador: puede estar horizontal si hay espacio */
+    .jugador-section {
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    /* Stats en 2 columnas */
+    .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .stats-complete {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Productos en 2 columnas */
+    .productos-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    /* Inventario con wrap */
+    #inventario-contenedor {
+        margin: 8px 10%;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .item {
+        width: 90px;
+        height: 70px;
+    }
+    
+    /* Enemigos en 2 columnas */
+    .enemies-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    /* Batalla vertical en tablets */
     .battle-participants {
         flex-direction: column;
         gap: 15px;
     }
     
-    /* Separador VS más pequeño */
     .vs-separator {
         font-size: 1.5rem;
         margin: 10px 0;
     }
     
-    /* Botones de batalla se apilan */
-    .battle-controls {
-        flex-direction: column;
-        align-items: center;
+    .battle-image-container {
+        width: 110px;
+        height: 110px;
     }
     
-    /* Enemigos en una sola columna */
-    .enemies-grid {
-        grid-template-columns: 1fr;
+    /* Botones en fila si caben */
+    .botones-mercado {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .battle-controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    /* Info del jugador puede ser horizontal */
+    .player-info-complete {
+        flex-direction: row;
+        gap: 20px;
     }
 }
 
-@media (max-width: 480px) {
+/* ============================================
+   DESKTOP PEQUEÑO: 721px - 1024px
+   ============================================ */
+@media (min-width: 721px) and (max-width: 1024px) {
+    /* Header tamaño normal */
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    /* Escenas con buen padding */
+    .scene {
+        padding: 25px;
+        max-width: 900px;
+    }
+    
+    main {
+        margin: 15px;
+    }
+    
+    /* Stats en 2x2 */
+    .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stats-complete {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Productos en 3 columnas */
     .productos-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
     }
     
-    .jugador-section {
-        flex-direction: column;
+    /* Inventario normal */
+    #inventario-contenedor {
+        margin: 8px 15%;
+        flex-wrap: nowrap;
     }
     
-    .avatar-container {
-        width: 80px;
+    .item {
+        width: 100px;
         height: 80px;
     }
     
-    .player-avatar-large {
+    /* Enemigos en 2 columnas (para que se vean bien) */
+    .enemies-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    /* Batalla horizontal */
+    .battle-participants {
+        flex-direction: row;
+        gap: 20px;
+    }
+    
+    .vs-separator {
+        font-size: 2rem;
+        margin: 0 15px;
+    }
+    
+    .battle-image-container {
         width: 120px;
         height: 120px;
     }
     
-    .final-status {
-        min-width: auto;
-        width: 100%;
+    /* Botones en fila */
+    .botones-mercado,
+    .battle-controls {
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    /* Info del jugador horizontal */
+    .player-info-complete {
+        flex-direction: row;
+        gap: 25px;
+    }
+}
+
+/* ============================================
+   DESKTOP GRANDE: Más de 1024px
+   ============================================ */
+@media (min-width: 1025px) {
+    /* Todo con tamaños originales del diseño */
+    .scene {
+        max-width: 1000px;
+        padding: 30px;
+    }
+    
+    /* Productos en 3 columnas */
+    .productos-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    /* Enemigos en fila si caben todos */
+    .enemies-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    /* Inventario sin wrap */
+    #inventario-contenedor {
+        margin: 8px 20%;
+        flex-wrap: nowrap;
     }
 }

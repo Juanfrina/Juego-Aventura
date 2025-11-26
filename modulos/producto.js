@@ -1,3 +1,8 @@
+/**
+ * Clase Producto
+ * @class
+ * @description Representa un producto del mercado con sus características y bonus
+ */
 export class Producto {
     nombre;
     precio;
@@ -6,12 +11,15 @@ export class Producto {
     bonus;
 
     /**
-    * Crea un nuevo producto con las propiedades indicadas.
-    * @param nombre Nombre del producto.
-    * @param precio Precio en céntimos.
-    * @param rareza Rareza del producto.
-    * @param tipo Tipo de producto.
-    * @param bonus Bonus que otorga el producto.
+    * Crea un nuevo producto con las propiedades indicadas
+    * @param {string} nombre - Nombre del producto
+    * @param {number} precio - Precio en céntimos (sin decimales)
+    * @param {string} rareza - Rareza del producto (Comun, Raro, Epico, Legendario)
+    * @param {string} tipo - Tipo de producto (arma, armadura, consumible)
+    * @param {Object} bonus - Bonus que otorga el producto
+    * @param {number} [bonus.ataque] - Bonus de ataque (para armas)
+    * @param {number} [bonus.defensa] - Bonus de defensa (para armaduras)
+    * @param {number} [bonus.curacion] - Bonus de curación (para consumibles)
     */
     constructor(nombre, precio, rareza, tipo, bonus) {
         this.nombre = nombre;
@@ -22,8 +30,8 @@ export class Producto {
     }
 
     /**
-    * Devuelve una descripción del producto.
-    * @returns Descripción del producto.
+    * Devuelve una descripción completa del producto
+    * @returns {string} Descripción del producto con todos sus atributos
     */
     presentar() {
         const precioFormateado = this.formatearPrecio();
@@ -31,17 +39,17 @@ export class Producto {
     }
 
     /**
-    * Formatea el precio en euros.
-    * @returns Precio formateado en euros.
+    * Formatea el precio de céntimos a euros
+    * @returns {string} Precio formateado en euros (ejemplo: "9.50€")
     */
     formatearPrecio() {
         return (this.precio / 100).toFixed(2) + "€";
     }
 
     /**
-    * Aplica un descuento del 50% al precio recibido y lo asigna al producto.
-    * @param porcentaje Porcentaje de descuento a aplicar (0-100).
-    * @returns Nuevo precio tras aplicar el descuento.
+    * Aplica un descuento porcentual al precio del producto
+    * @param {number} porcentaje - Porcentaje de descuento a aplicar (0-100)
+    * @returns {number} Nuevo precio en céntimos tras aplicar el descuento
     */
     aplicarDescuento(porcentaje) {
         if (porcentaje < 0) porcentaje = 0;
@@ -55,6 +63,10 @@ export class Producto {
 
 }
 
+/**
+ * Formateador de moneda para euros (ES)
+ * @constant {Intl.NumberFormat}
+ */
 export const EUR = new Intl.NumberFormat('es-ES', {
     style: 'currency'
     , currency: 'EUR'

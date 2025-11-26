@@ -1,0 +1,25 @@
+{
+  "name": "juego-aventura",
+  "version": "1.0.0",
+  "description": "Juego de rol web donde equipas a tu héroe, enfrentas enemigos progresivamente más difíciles y desafías al jefe final para convertirte en una leyenda",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "scripts": {
+    "docs": "jsdoc -c jsdoc.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Juanfrina/Juego-Aventura.git"
+  },
+  "author": "Juan Fco Hurtado",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Juanfrina/Juego-Aventura/issues"
+  },
+  "homepage": "https://github.com/Juanfrina/Juego-Aventura#readme",
+  "dependencies": {
+    "jsdoc": "^4.0.5"
+  }
+}

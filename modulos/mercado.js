@@ -1,9 +1,15 @@
 import {Producto} from './producto.js';
 
+/**
+ * Clase Mercado
+ * @class
+ * @description Gestiona el mercado de productos del juego con funciones de filtrado y descuentos
+ */
 export class Mercado {
 
     /**
-     * Crea un nuevo mercado con una lista de productos.
+     * Lista de todos los productos disponibles en el mercado
+     * @type {Array<Producto>}
      */
     listaProductos = [
         new Producto("Espada Basica", 500, "Comun", "arma", { ataque: 5 }),
@@ -33,36 +39,36 @@ export class Mercado {
     ];
 
     /**
-     * Filtrar productos por rareza
-     * @param rareza Rareza por la que filtrar 
-     * @returns Lista de productos que coinciden con la rareza indicada
+     * Filtra productos por rareza específica
+     * @param {string} rareza - Rareza por la que filtrar (Comun, Raro, Epico, Legendario)
+     * @returns {Array<Producto>} Lista de productos que coinciden con la rareza indicada
      */
     filtrarPorRareza(rareza) {
         return this.listaProductos.filter(producto => producto.rareza === rareza);
     }
 
     /**
-     * 
-     * @param rareza Rareza por la que filtrar
-     * @param porcentaje Porcentaje de descuento a aplicar
-     * @returns Lista de productos con el descuento aplicado
+     * Aplica un descuento a todos los productos de una rareza específica
+     * @param {string} rareza - Rareza de los productos a los que aplicar descuento
+     * @param {number} porcentaje - Porcentaje de descuento a aplicar (0-100)
+     * @returns {Array<Producto>} Lista de productos con el descuento aplicado a los que coinciden
      */
     aplicarDescuento(rareza, porcentaje) {
         return this.listaProductos.map(producto => producto.rareza === rareza ? producto.aplicarDescuento(porcentaje) : producto);
     }
 
     /**
-     * 
-     * @param nombre Nombre del producto a buscar
-     * @returns Producto que coincide con el nombre indicado o undefined si no se encuentra
+     * Busca un producto específico por su nombre
+     * @param {string} nombre - Nombre del producto a buscar
+     * @returns {Producto|undefined} Producto que coincide con el nombre o undefined si no se encuentra
      */
     buscarProducto(nombre) {
         return this.listaProductos.find(producto => producto.nombre === nombre);
     }
 
     /**
-     * 
-     * @returns Descripción de todos los productos en el mercado
+     * Muestra la descripción de todos los productos disponibles
+     * @returns {Array<string>} Array con las descripciones de todos los productos
      */
     mostrarProducto() {
         return this.listaProductos.map(producto => producto.presentar());

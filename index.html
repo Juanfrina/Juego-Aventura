@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Enlazamos nuestro CSS para que el juego se vea bonito -->
     <link rel="stylesheet" type="text/css" media="screen" href="estilos/styles.css">
+    <!-- Librería de confetti para animación final -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <!-- Cargamos el JavaScript principal como módulo ES6 - defer hace que se ejecute después de cargar el HTML -->
     <script type="module" src="main.js" defer></script>
     <title>Aventura-Reino</title>
@@ -165,6 +167,9 @@
                     <div class="battle-participants">
                         <!-- Lado del jugador (verde) -->
                         <div class="participant player-side">
+                            <div class="battle-image-container">
+                                <img id="battle-player-image" src="imagenes/heroe.jpg" alt="Jugador">
+                            </div>
                             <h4 id="battle-player-name">Jugador</h4>
                             <div class="participant-stats">
                                 <!-- Ataque y defensa calculados con los objetos comprados -->
@@ -175,6 +180,9 @@
                         <div class="vs-separator">VS</div>
                         <!-- Lado del enemigo (rojo) -->
                         <div class="participant enemy-side">
+                            <div class="battle-image-container">
+                                <img id="battle-enemy-image" src="" alt="Enemigo">
+                            </div>
                             <h4 id="battle-enemy-name">Enemigo</h4>
                             <div class="participant-stats">
                                 <!-- Stats del enemigo actual -->

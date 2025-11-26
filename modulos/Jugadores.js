@@ -1,23 +1,39 @@
-// clase Jugadores con atributos nombre, puntos, vida, vidaMaxima e inventario
 /**
  * Clase Jugadores
  * @class
+ * @description Representa un jugador con sus estadísticas, inventario y métodos de combate
  * @author Juanfrina
  * @version 1.0
  */
 export class Jugadores {
+    /**
+     * Nombre del jugador
+     * @type {string}
+     */
     nombre;
+    /**
+     * Puntos acumulados del jugador
+     * @type {number}
+     */
     puntos = 0;
+    /**
+     * Vida actual del jugador
+     * @type {number}
+     */
     vida = 100;
+    /**
+     * Vida máxima base del jugador
+     * @type {number}
+     */
     vidaMaxima = 100;
+    /**
+     * Inventario del jugador con todos los objetos
+     * @type {Array<Object>}
+     */
     inventario = [];
     /**
-     * @param nombre Nombre del jugador
-     * @param puntos Puntos del jugador
-     * @param vida Vida actual del jugador
-     * @param vidaMaxima Vida máxima del jugador
-     * @param inventario Array de objetos del jugador
-     *
+     * Constructor de la clase Jugadores
+     * @param {string} nombre - Nombre del jugador
      */
     constructor(nombre) {
         this.nombre = nombre;
@@ -28,11 +44,14 @@ export class Jugadores {
 
     }
     /**
-     * Añadir un objeto al inventario del jugador.
-     * @param objeto Objeto a añadir al inventario
+     * Añade un objeto al inventario del jugador (realiza copia del objeto)
+     * @param {Object} objeto - Objeto a añadir al inventario
+     * @param {string} objeto.nombre - Nombre del objeto
+     * @param {string} objeto.tipo - Tipo del objeto (arma, armadura, consumible)
+     * @param {number} [objeto.ataque] - Bonus de ataque (si es arma)
+     * @param {number} [objeto.defensa] - Bonus de defensa (si es armadura)
+     * @param {number} [objeto.curacion] - Bonus de curación (si es consumible)
      */
-
-    //añadir objetos al inventario
     anadirObjeto(objeto) {
         const objetoClone = {
             ...objeto
@@ -40,18 +59,16 @@ export class Jugadores {
         this.inventario.push(objetoClone);
     }
     /**
-     * Sumar puntos al jugador cuando gane batallas.
-     * @param puntos Puntos a sumar
+     * Suma puntos al jugador cuando gana batallas
+     * @param {number} puntos - Puntos a sumar al total
      */
-    //sumar puntos al jugador cuando gane batallas.
     sumarPuntos(puntos) {
         this.puntos += puntos;
     }
     /**
-     * Obtener ataque total: Calculará el ataque en función de los objetos.
-     * @returns Ataque total del jugador
+     * Calcula el ataque total del jugador sumando el bonus de todas las armas en el inventario
+     * @returns {number} Ataque total del jugador (suma de todos los bonus de ataque)
      */
-    //Obtener ataque total: Calculará el ataque en función de los objetos.
     ataqueTotal() {
         let miAtaque = 0; // Empiezo con 0
 
@@ -65,10 +82,9 @@ export class Jugadores {
         return miAtaque;
     }
     /**
-     * Obtener defensa total: Calculará la defensa en función de los objetos.
-     * @returns Defensa total del jugador
+     * Calcula la defensa total del jugador sumando el bonus de todas las armaduras en el inventario
+     * @returns {number} Defensa total del jugador (suma de todos los bonus de defensa)
      */
-    //Obtener defensa total: Calculará la defensa en función de los objetos.
     defensaTotal() {
         let miDefensa = 0; // Empiezo con 0
 
@@ -82,10 +98,25 @@ export class Jugadores {
         return miDefensa;
     }
     /**
-     * Agrupar inventario por tipo de objeto.
-     * @returns Inventario agrupado por tipo
+     * Calcula la vida total del jugador sumando la vida base más todos los consumibles
+     * @returns {number} Vida total del jugador (vida base + bonus de consumibles)
      */
-    //Agrupar inventario por tipo de objeto.
+    vidaTotal() {
+        let vidaTotal = this.vidaMaxima; // Empiezo con la vida máxima base
+
+        // Busco todos los consumibles que aumentan la vida
+        for (let objeto of this.inventario) {
+            if (objeto.tipo === 'consumible') { // Si es consumible
+                vidaTotal += objeto.curacion ? objeto.curacion : 0; // Sumo su curación si la tiene
+            }
+        }
+
+        return vidaTotal;
+    }
+    /**
+     * Agrupa el inventario del jugador por tipo de objeto
+     * @returns {Object} Objeto con arrays de objetos agrupados por tipo {arma: [], armadura: [], consumible: []}
+     */
     inventarioPorTipo() {
         const grupos = {};
 
@@ -101,16 +132,24 @@ export class Jugadores {
         return grupos;
     }
     /**
-     * Mostrar información del jugador.
-     * @returns Información del jugador
+     * Obtiene toda la información del jugador en un objeto
+     * @returns {Object} Objeto con toda la información del jugador
+     * @property {string} nombre - Nombre del jugador
+     * @property {number} puntos - Puntos acumulados
+     * @property {number} vida - Vida actual
+     * @property {number} vidaMaxima - Vida máxima base
+     * @property {number} vidaTotal - Vida total con bonus de consumibles
+     * @property {number} ataque - Ataque total con bonus de armas
+     * @property {number} defensa - Defensa total con bonus de armaduras
+     * @property {Object} inventario - Inventario agrupado por tipo
      */
-    //Mostrar jugador: Se mostrará su nombre, puntos, vida, ataque, defensa e inventario.
     mostrar() {
         return {
             nombre: this.nombre,
             puntos: this.puntos,
             vida: this.vida, // Añadir vida actual
             vidaMaxima: this.vidaMaxima,
+            vidaTotal: this.vidaTotal(), // Vida total con bonus de consumibles
             ataque: this.ataqueTotal(),
             defensa: this.defensaTotal(),
             inventario: this.inventarioPorTipo()

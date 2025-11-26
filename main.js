@@ -4,38 +4,86 @@ import { Jugadores } from './modulos/Jugadores.js';                    // Clase 
 import { Enemigos, JefeFinal } from './modulos/enemigos.js';          // Clases para crear enemigos
 import { Mercado } from './modulos/mercado.js';                       // Clase del mercado con productos
 import { batalla, categorizePlayers, mostrarReporteCompleto } from './modulos/Ranking.js'; // Sistema de combate
-import { showScene } from './utils/format.js';                       // Función para cambiar de escena
+import { 
+    showScene,
+    calcularDescuentoAleatorio,
+    formatearPrecio,
+    generarPuntosAleatorios,
+    obtenerImagenPorTipo,
+    obtenerImagenEnemigo,
+    seleccionarAleatorios,
+    actualizarTexto,
+    toggleVisibilidad
+} from './utils/utils.js';                                            // Funciones utilitarias
 
 // === VARIABLES GLOBALES DEL JUEGO ===
 // Estas variables mantienen el estado del juego durante toda la partida
-let jugador = null;              // Instancia del jugador actual
-let mercado = null;              // Instancia del mercado con todos los productos
-let enemigos = [];               // Array con los 3 enemigos normales
-let jefeFinal = null;            // Instancia del jefe final (Dragón)
-let productosSeleccionados = []; // Array temporal de productos que el jugador está comprando
-let enemigoActual = 0;           // Índice del enemigo contra el que estamos luchando (0, 1, 2)
-let batallasGanadas = 0;         // Contador de victorias para la clasificación final
-let objetosComprados = 0;        // Contador de objetos comprados para las estadísticas
+
+/**
+ * Instancia del jugador actual
+ * @type {Jugadores|null}
+ */
+let jugador = null;
+
+/**
+ * Instancia del mercado con todos los productos
+ * @type {Mercado|null}
+ */
+let mercado = null;
+
+/**
+ * Array con los 3 enemigos normales (Goblin, Orco, Troll)
+ * @type {Enemigos[]}
+ */
+let enemigos = [];
+
+/**
+ * Instancia del jefe final (Dragón)
+ * @type {JefeFinal|null}
+ */
+let jefeFinal = null;
+
+/**
+ * Array temporal de productos que el jugador está comprando
+ * @type {Array}
+ */
+let productosSeleccionados = [];
+
+/**
+ * Índice del enemigo contra el que estamos luchando (0, 1, 2)
+ * @type {number}
+ */
+let enemigoActual = 0;
+
+/**
+ * Contador de victorias para la clasificación final
+ * @type {number}
+ */
+let batallasGanadas = 0;
+
+/**
+ * Contador de objetos comprados para las estadísticas
+ * @type {number}
+ */
+let objetosComprados = 0;
 
 // === INICIALIZACIÓN DEL JUEGO ===
-// Este evento se ejecuta cuando toda la página HTML se ha cargado completamente
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("🏰 Iniciando Aventura en el Reino de JS");
-    initializeGame(); // Llamamos a la función principal de inicialización
-    
-    // Pequeño delay para asegurar que todo esté listo antes de actualizar el inventario
-    setTimeout(() => {
-        updateInventoryDisplay();
-    }, 100);
-});
+// La inicialización del DOM se maneja en el listener consolidado al final del archivo
 
 // === FUNCIÓN PRINCIPAL DE INICIALIZACIÓN ===
 // Esta función configura todo el estado inicial del juego
+
+/**
+ * Inicializa el juego creando el jugador, mercado, enemigos y jefe final.
+ * Resetea todas las variables a su estado inicial y muestra la primera escena.
+ * @returns {void}
+ */
 function initializeGame() {
     console.log('Inicializando juego...');
     
     // Crear jugador con nombre por defecto - se puede cambiar en la escena 1
     jugador = new Jugadores('Aventurero');
+    jugador.vida = 100; // Asegurar que empieza con vida completa
     console.log('Jugador creado:', jugador);
     
     // Crear mercado con todos los productos disponibles (24 productos)
@@ -72,6 +120,13 @@ function initializeGame() {
 // === NAVEGACIÓN ENTRE ESCENAS ===
 // Sistema de navegación - solo una escena visible a la vez
 // La hacemos global (window.) para poder llamarla desde los botones HTML
+
+/**
+ * Muestra una escena específica y oculta todas las demás.
+ * Ejecuta acciones específicas según la escena que se va a mostrar.
+ * @param {string} sceneId - El ID de la escena a mostrar ('scene1', 'scene2', etc.)
+ * @returns {void}
+ */
 window.showScene = function(sceneId) {
     // Primero ocultamos todas las escenas quitando la clase 'active'
     document.querySelectorAll('.scene').forEach(scene => {
@@ -111,6 +166,12 @@ window.showScene = function(sceneId) {
 };
 
 // === ESCENA 1: ACTUALIZAR ESTADÍSTICAS DEL JUGADOR ===
+
+/**
+ * Actualiza las estadísticas del jugador en la interfaz (puntos, vida, ataque, defensa).
+ * También actualiza el nombre si se cambió y refresca el inventario visual.
+ * @returns {void}
+ */
 function updatePlayerStats() {
     if (!jugador) return;
     
@@ -132,6 +193,12 @@ function updatePlayerStats() {
 
 // === ESCENA 2: INICIALIZAR MERCADO ===
 // Esta función configura la tienda cada vez que el jugador entra
+
+/**
+ * Inicializa el mercado generando descuentos aleatorios por rareza
+ * y mostrando 9 productos aleatorios de los 24 disponibles.
+ * @returns {void}
+ */
 function initializeMarket() {
     if (!mercado) return; // Salir si no hay mercado creado
     
@@ -141,10 +208,10 @@ function initializeMarket() {
     // Sistema de descuentos aleatorios - cada rareza tiene un rango diferente
     // Los productos más raros tienen descuentos más grandes
     const descuentos = {
-        'Comun': Math.floor(Math.random() * 20) + 5,     // 5-25% de descuento
-        'Raro': Math.floor(Math.random() * 30) + 10,     // 10-40% de descuento
-        'Epico': Math.floor(Math.random() * 40) + 15,    // 15-55% de descuento
-        'Legendario': Math.floor(Math.random() * 50) + 20 // 20-70% de descuento
+        'Comun': calcularDescuentoAleatorio('Comun'),
+        'Raro': calcularDescuentoAleatorio('Raro'),
+        'Epico': calcularDescuentoAleatorio('Epico'),
+        'Legendario': calcularDescuentoAleatorio('Legendario')
     };
     
     // Actualizar el texto informativo sobre las ofertas
@@ -156,9 +223,7 @@ function initializeMarket() {
     
     // De los 24 productos disponibles, seleccionamos 9 al azar para mostrar
     // Esto hace que cada visita al mercado sea diferente
-    const productosAMostrar = mercado.listaProductos
-        .sort(() => Math.random() - 0.5)  // Mezclar aleatoriamente
-        .slice(0, 9);                     // Tomar solo los primeros 9
+    const productosAMostrar = seleccionarAleatorios(mercado.listaProductos, 9);
     
     // Crear una tarjeta visual para cada producto seleccionado
     productosAMostrar.forEach(producto => {
@@ -172,6 +237,12 @@ function initializeMarket() {
     updateCart(); // Actualizar la UI del carrito
 }
 
+/**
+ * Crea una tarjeta HTML para mostrar un producto con su descuento aplicado.
+ * @param {Object} producto - El objeto producto del mercado
+ * @param {number} descuento - Porcentaje de descuento a aplicar (0-100)
+ * @returns {HTMLElement} El elemento DOM de la tarjeta del producto
+ */
 function createProductCard(producto, descuento) {
     const card = document.createElement('div');
     card.className = 'producto-card';
@@ -180,28 +251,15 @@ function createProductCard(producto, descuento) {
     const precioOriginal = producto.precio;
     const precioConDescuento = Math.round(precioOriginal * (1 - descuento / 100));
     
-    // Determinar imagen según tipo
-    let imageSrc = 'imagenes/';
-    switch(producto.tipo) {
-        case 'arma':
-            imageSrc += 'arma.png';
-            break;
-        case 'armadura':
-            imageSrc += 'armadura.png';
-            break;
-        case 'consumible':
-            imageSrc += 'consumible.png';
-            break;
-        default:
-            imageSrc += 'arma.png';
-    }
+    // Determinar imagen según tipo usando función utilitaria
+    const imageSrc = obtenerImagenPorTipo(producto.tipo);
     
     card.innerHTML = `
         <img src="${imageSrc}" alt="${producto.nombre}">
         <h4 class="producto-nombre">${producto.nombre}</h4>
         <div class="producto-info">
-            <span class="precio-original">${(precioOriginal/100).toFixed(2)}€</span>
-            <span class="precio-descuento">${(precioConDescuento/100).toFixed(2)}€</span>
+            <span class="precio-original">${formatearPrecio(precioOriginal)}</span>
+            <span class="precio-descuento">${formatearPrecio(precioConDescuento)}</span>
         </div>
         <div class="producto-detalles">
             <span class="categoria">${producto.tipo}</span>
@@ -215,6 +273,16 @@ function createProductCard(producto, descuento) {
     return card;
 }
 
+// Manejar selección/deselección de productos en el mercado
+
+/**
+ * Maneja la selección y deselección de productos en el mercado.
+ * Añade o quita productos del carrito con animación visual.
+ * @param {HTMLElement} card - El elemento DOM de la tarjeta del producto
+ * @param {Object} producto - El objeto producto
+ * @param {number} precio - El precio final con descuento aplicado
+ * @returns {void}
+ */
 function toggleProductSelection(card, producto, precio) {
     const isSelected = card.classList.contains('selected');
     
@@ -229,11 +297,29 @@ function toggleProductSelection(card, producto, precio) {
             ...producto,
             precioFinal: precio
         });
+        
+        // Mostrar indicador animado de añadido
+        const indicator = document.createElement('div');
+        indicator.className = 'added-indicator';
+        indicator.textContent = '✓';
+        card.appendChild(indicator);
+        
+        // Eliminar el indicador después de la animación
+        setTimeout(() => {
+            indicator.remove();
+        }, 2000);
     }
     
     updateCart();
 }
 
+// Actualizar la interfaz del carrito de compras
+
+/**
+ * Actualiza la interfaz del carrito mostrando los productos seleccionados,
+ * el total y habilitando/deshabilitando el botón de compra.
+ * @returns {void}
+ */
 function updateCart() {
     const cartItems = document.getElementById('productos-seleccionados');
     const cartTotal = document.getElementById('total-precio');
@@ -247,18 +333,24 @@ function updateCart() {
         cartItems.innerHTML = productosSeleccionados.map(p => 
             `<div class="producto-seleccionado">
                 <span>${p.nombre}</span>
-                <span>${(p.precioFinal/100).toFixed(2)}€</span>
+                <span>${formatearPrecio(p.precioFinal)}</span>
             </div>`
         ).join('');
         
         const total = productosSeleccionados.reduce((sum, p) => sum + p.precioFinal, 0);
-        cartTotal.textContent = `${(total/100).toFixed(2)}€`;
+        cartTotal.textContent = formatearPrecio(total);
         buyButton.disabled = false;
     }
 }
 
 // === FUNCIÓN PARA COMPRAR PRODUCTOS ===
 // Esta función se ejecuta cuando el jugador confirma la compra
+
+/**
+ * Procesa la compra de los productos seleccionados,
+ * añadiéndolos al inventario del jugador y actualizando la interfaz.
+ * @returns {void}
+ */
 window.buyItems = function() {
     // Validaciones básicas - no comprar si no hay jugador o productos seleccionados
     if (!jugador || productosSeleccionados.length === 0) return;
@@ -308,6 +400,12 @@ window.buyItems = function() {
 };
 
 // === ESCENA 3: ACTUALIZAR ESTADO ACTUAL ===
+
+/**
+ * Actualiza la escena 3 con el estado actual del jugador
+ * mostrando puntos, vida, ataque, defensa y objetos comprados.
+ * @returns {void}
+ */
 function updateScene3() {
     if (!jugador) return;
     
@@ -333,6 +431,12 @@ function updateScene3() {
 }
 
 // === ESCENA 4: INICIALIZAR ENEMIGOS ===
+
+/**
+ * Inicializa la galería de enemigos mostrando los 3 enemigos normales
+ * y el jefe final con sus imágenes y estadísticas.
+ * @returns {void}
+ */
 function initializeEnemies() {
     const enemiesGrid = document.getElementById('enemies-grid');
     enemiesGrid.innerHTML = '';
@@ -348,29 +452,20 @@ function initializeEnemies() {
     enemiesGrid.appendChild(bossCard);
 }
 
+// Crear tarjeta visual para cada enemigo
+
+/**
+ * Crea una tarjeta HTML para mostrar un enemigo con su imagen y estadísticas.
+ * @param {Enemigos|JefeFinal} enemigo - El objeto enemigo o jefe final
+ * @param {boolean} isBoss - Indica si es el jefe final para aplicar estilos especiales
+ * @returns {HTMLElement} El elemento DOM de la tarjeta del enemigo
+ */
 function createEnemyCard(enemigo, isBoss) {
     const card = document.createElement('div');
     card.className = `enemy-card ${isBoss ? 'boss' : ''}`;
     
-    // Determinar la imagen del enemigo
-    let imageSrc = 'imagenes/';
-    switch(enemigo.nombre.toLowerCase()) {
-        case 'goblin':
-            imageSrc += 'Goblin.jpg';
-            break;
-        case 'orco':
-            imageSrc += 'Orco.jpg';
-            break;
-        case 'troll':
-            imageSrc += 'Troll.jpg';
-            break;
-        case 'dragón':
-        case 'dragon':
-            imageSrc += 'Dragon.jpg';
-            break;
-        default:
-            imageSrc += 'enemigo.jpg'; // Imagen por defecto si no coincide
-    }
+    // Determinar la imagen del enemigo usando función utilitaria
+    const imageSrc = obtenerImagenEnemigo(enemigo.nombre);
     
     card.innerHTML = `
         <img class="enemy-image" src="${imageSrc}" alt="${enemigo.nombre}">
@@ -393,6 +488,12 @@ function createEnemyCard(enemigo, isBoss) {
 
 // === ESCENA 5: SISTEMA DE BATALLAS ===
 // Preparar la arena de combate - el corazón del juego
+
+/**
+ * Inicializa el sistema de batallas, reseteando contadores
+ * y preparando la interfaz para la primera batalla.
+ * @returns {void}
+ */
 function initializeBattles() {
     enemigoActual = 0;    // Empezamos con el primer enemigo (Goblin)
     batallasGanadas = 0;  // Resetear contador de victorias
@@ -419,9 +520,17 @@ function initializeBattles() {
     if (enemySide) {
         enemySide.style.backgroundColor = 'rgba(255, 68, 68, 0.2)'; // Rojo claro
         enemySide.style.borderColor = '#ff4444';                    // Borde rojo normal
-    }
+    };
 }
 
+// Configurar la interfaz para la batalla actual
+
+/**
+ * Configura la interfaz para mostrar la batalla actual contra un enemigo normal.
+ * Actualiza nombres, estadísticas, imágenes y reinicia las animaciones.
+ * @param {Enemigos} enemigo - El enemigo contra el que se va a luchar
+ * @returns {void}
+ */
 function setupBattle(enemigo) {
     document.getElementById('battle-title').textContent = 
         `Batalla ${enemigoActual + 1}: ${jugador.nombre} vs ${enemigo.nombre}`;
@@ -431,12 +540,44 @@ function setupBattle(enemigo) {
     document.getElementById('battle-player-attack').textContent = jugador.ataqueTotal();
     document.getElementById('battle-player-defense').textContent = jugador.defensaTotal();
     
+    // Imagen del jugador
+    document.getElementById('battle-player-image').src = 'imagenes/heroe.jpg';
+    
     // Información del enemigo
     document.getElementById('battle-enemy-name').textContent = enemigo.nombre;
     document.getElementById('battle-enemy-attack').textContent = enemigo.nivelataque;
     document.getElementById('battle-enemy-health').textContent = enemigo.puntosvida;
+    
+    // Imagen del enemigo usando función utilitaria
+    const imageSrc = obtenerImagenEnemigo(enemigo.nombre);
+    document.getElementById('battle-enemy-image').src = imageSrc;
+    
+    // Reiniciar animaciones quitando y volviendo a añadir las clases
+    const playerSide = document.querySelector('.player-side');
+    const enemySide = document.querySelector('.enemy-side');
+    
+    if (playerSide && enemySide) {
+        // Remover clases para resetear animación
+        playerSide.style.animation = 'none';
+        enemySide.style.animation = 'none';
+        
+        // Forzar reflow para que el navegador reconozca el cambio
+        void playerSide.offsetWidth;
+        void enemySide.offsetWidth;
+        
+        // Volver a aplicar animaciones
+        playerSide.style.animation = 'slideInFromLeft 0.8s ease-out';
+        enemySide.style.animation = 'slideInFromRight 0.8s ease-out';
+    }
 }
 
+// Configurar la interfaz para la batalla contra el jefe final
+
+/**
+ * Configura la interfaz para la batalla final contra el jefe.
+ * Cambia colores, actualiza información y reinicia animaciones con efecto especial.
+ * @returns {void}
+ */
 function setupBattleBoss() {
     document.getElementById('battle-title').textContent = 
         `🐉 BATALLA FINAL: ${jugador.nombre} vs ${jefeFinal.nombre}`;
@@ -446,19 +587,49 @@ function setupBattleBoss() {
     document.getElementById('battle-player-attack').textContent = jugador.ataqueTotal();
     document.getElementById('battle-player-defense').textContent = jugador.defensaTotal();
     
+    // Imagen del jugador
+    document.getElementById('battle-player-image').src = 'imagenes/heroe.jpg';
+    
     // Información del jefe final
     document.getElementById('battle-enemy-name').textContent = `${jefeFinal.nombre} (JEFE)`;
     document.getElementById('battle-enemy-attack').textContent = jefeFinal.nivelataque;
     document.getElementById('battle-enemy-health').textContent = jefeFinal.puntosvida;
     
+    // Imagen del jefe final
+    const imageSrc = obtenerImagenEnemigo(jefeFinal.nombre);
+    document.getElementById('battle-enemy-image').src = imageSrc;
+    
     // Cambiar colores para indicar que es el jefe final
     const enemySide = document.querySelector('.enemy-side');
     enemySide.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
     enemySide.style.borderColor = '#ff0000';
+    
+    // Reiniciar animaciones para el jefe final
+    const playerSide = document.querySelector('.player-side');
+    
+    if (playerSide && enemySide) {
+        // Remover animaciones
+        playerSide.style.animation = 'none';
+        enemySide.style.animation = 'none';
+        
+        // Forzar reflow
+        void playerSide.offsetWidth;
+        void enemySide.offsetWidth;
+        
+        // Volver a aplicar animaciones
+        playerSide.style.animation = 'slideInFromRight 0.8s ease-out';
+        enemySide.style.animation = 'slideInFromLeft 0.8s ease-out';
+    }
 }
 
 // === FUNCIÓN PRINCIPAL DE BATALLA ===
 // Se ejecuta cuando el jugador hace clic en "Iniciar Batalla"
+
+/**
+ * Inicia una batalla contra el enemigo actual o el jefe final.
+ * Resetea la vida del jugador, ejecuta la batalla y muestra el resultado.
+ * @returns {void}
+ */
 window.startBattle = function() {
     // Verificar si ya terminamos con todos los enemigos normales
     if (enemigoActual >= enemigos.length) {
@@ -466,6 +637,9 @@ window.startBattle = function() {
         battleBoss();
         return;
     }
+    
+    // Resetear vida del jugador al máximo (con bonus de consumibles) antes de cada batalla
+    jugador.vida = jugador.vidaTotal();
     
     // Obtener el enemigo actual (Goblin, Orco o Troll)
     const enemigo = enemigos[enemigoActual];
@@ -478,6 +652,15 @@ window.startBattle = function() {
     showBattleResult(resultado, enemigo);
 };
 
+// Mostrar el resultado de la batalla en la interfaz
+
+/**
+ * Muestra el resultado de una batalla en la interfaz con mensajes personalizados.
+ * Gestiona la visibilidad de botones según si quedan más enemigos.
+ * @param {Object} resultado - Objeto con ganador, puntosGanados y detalles de la batalla
+ * @param {Enemigos} enemigo - El enemigo que se enfrentó
+ * @returns {void}
+ */
 function showBattleResult(resultado, enemigo) {
     console.log(`Resultado batalla ${enemigoActual + 1}:`, resultado.ganador, 'vs', enemigo.nombre);
     console.log(`Enemigo actual: ${enemigoActual}, Total enemigos: ${enemigos.length}`);
@@ -487,12 +670,12 @@ function showBattleResult(resultado, enemigo) {
     const resultDescription = document.getElementById('result-description');
     const resultPoints = document.getElementById('result-points');
     
-    battleResult.classList.remove('hidden');
-    document.getElementById('start-battle-btn').classList.add('hidden');
+    toggleVisibilidad('battle-result', false);
+    toggleVisibilidad('start-battle-btn', true);
     
     if (resultado.ganador === 'player') {
-        const puntosGanados = Math.floor(Math.random() * 50) + 50;
-        jugador.sumarPuntos(puntosGanados);
+        // Los puntos ya fueron sumados en la función batalla()
+        const puntosGanados = resultado.puntosGanados || 0;
         batallasGanadas++;
         
         resultTitle.textContent = '¡Victoria!';
@@ -526,6 +709,13 @@ function showBattleResult(resultado, enemigo) {
     }
 }
 
+// Manejar la transición a la siguiente batalla o al jefe final
+
+/**
+ * Maneja la transición a la siguiente batalla.
+ * Avanza al siguiente enemigo o prepara la batalla final contra el jefe.
+ * @returns {void}
+ */
 window.nextBattle = function() {
     enemigoActual++;
     
@@ -550,7 +740,17 @@ window.nextBattle = function() {
     }
 };
 
+// Función para manejar la batalla contra el jefe final
+
+/**
+ * Ejecuta la batalla contra el jefe final y muestra el resultado.
+ * Resetea la vida del jugador y actualiza las estadísticas.
+ * @returns {void}
+ */
 function battleBoss() {
+    // Resetear vida del jugador al máximo (con bonus de consumibles) antes de la batalla final
+    jugador.vida = jugador.vidaTotal();
+    
     const resultado = batalla(jugador, jefeFinal);
     
     const battleResult = document.getElementById('battle-result');
@@ -558,12 +758,12 @@ function battleBoss() {
     const resultDescription = document.getElementById('result-description');
     const resultPoints = document.getElementById('result-points');
     
-    battleResult.classList.remove('hidden');
-    document.getElementById('start-battle-btn').classList.add('hidden');
+    toggleVisibilidad('battle-result', false);
+    toggleVisibilidad('start-battle-btn', true);
     
     if (resultado.ganador === 'player') {
-        const puntosGanados = Math.floor(Math.random() * 100) + 200;
-        jugador.sumarPuntos(puntosGanados);
+        // Los puntos ya fueron sumados en la función batalla()
+        const puntosGanados = resultado.puntosGanados || 0;
         batallasGanadas++;
         
         resultTitle.textContent = '¡VICTORIA ÉPICA!';
@@ -588,6 +788,13 @@ function battleBoss() {
 
 // === ESCENA 6: MOSTRAR RESULTADOS FINALES ===
 // Sistema de clasificación final basado en el rendimiento del jugador
+
+/**
+ * Calcula y muestra los resultados finales del juego.
+ * Clasifica al jugador como PRO, A medias o Perdedor según batallas ganadas.
+ * Activa confetti si el jugador ganó todas las batallas.
+ * @returns {void}
+ */
 function showFinalResults() {
     // Calcular total de enemigos disponibles (3 normales + 1 jefe = 4)
     const totalEnemigos = enemigos.length + 1; // +1 por el jefe final
@@ -633,10 +840,44 @@ function showFinalResults() {
     document.getElementById('final-level').textContent = clasificacionNivel;  // Nivel final
     
     console.log(`Clasificación final: ${clasificacionTexto}`);
+    
+    // Animación de confetti si es PRO
+    if (batallasGanadas === totalEnemigos && typeof confetti !== 'undefined') {
+        // Lanzar confetti múltiples veces para efecto dramático
+        const duration = 3000; // 3 segundos
+        const end = Date.now() + duration;
+        
+        const interval = setInterval(() => {
+            if (Date.now() > end) {
+                clearInterval(interval);
+                return;
+            }
+            
+            // Confetti desde ambos lados
+            confetti({
+                particleCount: 100,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0, y: 0.6 }
+            });
+            confetti({
+                particleCount: 100,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1, y: 0.6 }
+            });
+        }, 250);
+    }
 }
 
 // === FUNCIÓN PARA REINICIAR EL JUEGO ===
 // Permite empezar una nueva partida desde cero
+
+/**
+ * Reinicia el juego completo, reseteando todas las variables
+ * y volviendo a la primera escena.
+ * @returns {void}
+ */
 window.restartGame = function() {
     // Simplemente llamamos a la función de inicialización
     // Esto resetea todas las variables y vuelve a la escena 1
@@ -645,6 +886,12 @@ window.restartGame = function() {
 
 // === ACTUALIZAR INVENTARIO VISUAL ===
 // Esta función mantiene sincronizado el inventario visual (footer) con el inventario real del jugador
+
+/**
+ * Actualiza el inventario visual en el footer mostrando las imágenes
+ * de los objetos que el jugador tiene equipados.
+ * @returns {void}
+ */
 function updateInventoryDisplay() {
     // Obtener todas las imágenes de los 6 slots del inventario
     const inventarioItems = document.querySelectorAll('#inventario-contenedor .item img');
@@ -655,22 +902,9 @@ function updateInventoryDisplay() {
         if (jugador && jugador.inventario && jugador.inventario[index]) {
             // SLOT OCUPADO - hay un objeto aquí
             const item = jugador.inventario[index];
-            let imageSrc = 'imagenes/';
             
-            // Determinar qué imagen mostrar según el tipo de objeto
-            switch(item.tipo) {
-                case 'arma':
-                    imageSrc += 'arma.png';        // Imagen de espada para armas
-                    break;
-                case 'armadura':
-                    imageSrc += 'armadura.png';    // Imagen de escudo para armaduras
-                    break;
-                case 'consumible':
-                    imageSrc += 'consumible.png';  // Imagen de poción para consumibles
-                    break;
-                default:
-                    imageSrc += 'arma.png';        // Por defecto, imagen de arma
-            }
+            // Determinar qué imagen mostrar según el tipo de objeto usando función utilitaria
+            const imageSrc = obtenerImagenPorTipo(item.tipo);
             
             // Configurar la imagen para mostrar el objeto
             img.src = imageSrc;
@@ -694,6 +928,12 @@ window.jugador = jugador;
 window.updatePlayerStats = updatePlayerStats;
 
 // === FUNCIÓN PARA ACTUALIZAR NOMBRE DEL JUGADOR ===
+
+/**
+ * Actualiza el nombre del jugador desde el input de texto
+ * y refresca las estadísticas en la interfaz.
+ * @returns {void}
+ */
 window.updatePlayerName = function() {
     const nameInput = document.getElementById('player-name');
     if (nameInput && jugador) {
@@ -703,7 +943,18 @@ window.updatePlayerName = function() {
 };
 
 // === CONFIGURAR EVENT LISTENERS AL CARGAR EL DOM ===
+// Este es el único punto de entrada cuando se carga la página
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("🏰 Iniciando Aventura en el Reino de JS");
+    
+    // Inicializar el juego completo
+    initializeGame();
+    
+    // Pequeño delay para asegurar que todo esté listo antes de actualizar el inventario
+    setTimeout(() => {
+        updateInventoryDisplay();
+    }, 100);
+    
     // Listener para cambio de nombre
     const nameInput = document.getElementById('player-name');
     if (nameInput) {
