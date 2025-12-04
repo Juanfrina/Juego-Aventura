@@ -61,6 +61,7 @@ export function obtenerImagenPorTipo(tipo) {
         'arma': 'imagenes/arma.png',
         'armadura': 'imagenes/armadura.png',
         'consumible': 'imagenes/consumible.png'
+        //'accesorio': 'imagenes/accesorio.png'
     };
     
     return imagenes[tipo] || 'imagenes/arma.png';
@@ -76,6 +77,7 @@ export function obtenerImagenEnemigo(nombre) {
         'goblin': 'imagenes/Goblin.jpg',
         'orco': 'imagenes/Orco.jpg',
         'troll': 'imagenes/Troll.jpg',
+        //'esqueleto': 'imagenes/Esqueleto.jpg',
         'dragón': 'imagenes/Dragon.jpg',
         'dragon': 'imagenes/Dragon.jpg'
     };

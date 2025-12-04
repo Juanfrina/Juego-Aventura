@@ -93,7 +93,8 @@ function initializeGame() {
     // Crear los 3 enemigos normales con dificultad progresiva
     enemigos = [
         new Enemigos('Enemigo', 'Goblin', 15, 50),   // Fácil - primer enemigo
-        new Enemigos('Enemigo', 'Orco', 25, 80),     // Medio - segundo enemigo  
+        new Enemigos('Enemigo', 'Orco', 25, 80),     // Medio - segundo enemigo
+        //new Enemigos('Enemigo', 'Esqueleto', 30, 90),    // Difícil - cuarto enemigo
         new Enemigos('Enemigo', 'Troll', 35, 100)    // Difícil - tercer enemigo
     ];
     
@@ -170,6 +171,7 @@ window.showScene = function(sceneId) {
 /**
  * Actualiza las estadísticas del jugador en la interfaz (puntos, vida, ataque, defensa).
  * También actualiza el nombre si se cambió y refresca el inventario visual.
+ * Sistema de 10 puntos para distribuir entre vida, ataque y defensa.
  * @returns {void}
  */
 function updatePlayerStats() {
@@ -181,11 +183,76 @@ function updatePlayerStats() {
         jugador.nombre = nameInput.value || 'Aventurero';
     }
     
+    // Obtener valores de los inputs
+    const vidaInput = document.getElementById('vida-input');
+    const ataqueInput = document.getElementById('ataque-input');
+    const defensaInput = document.getElementById('defensa-input');
+    const puntosRestantesSpan = document.getElementById('puntos-restantes');
+    
+    let vidaPuntos = parseInt(vidaInput?.value) || 0;
+    let ataquePuntos = parseInt(ataqueInput?.value) || 0;
+    let defensaPuntos = parseInt(defensaInput?.value) || 0;
+    
+    // Validar que no sean valores negativos
+    if (vidaPuntos < 0) {
+        vidaPuntos = 0;
+        if (vidaInput) vidaInput.value = 0;
+    }
+    if (ataquePuntos < 0) {
+        ataquePuntos = 0;
+        if (ataqueInput) ataqueInput.value = 0;
+    }
+    if (defensaPuntos < 0) {
+        defensaPuntos = 0;
+        if (defensaInput) defensaInput.value = 0;
+    }
+    
+    // Calcular puntos gastados
+    const PUNTOS_TOTALES = 10;
+    const puntosGastados = vidaPuntos + ataquePuntos + defensaPuntos;
+    const puntosRestantes = PUNTOS_TOTALES - puntosGastados;
+    
+    // Validar que no se excedan los 10 puntos
+    if (puntosRestantes < 0) {
+        // Si se excede, ajustar el último valor modificado
+        if (vidaInput === document.activeElement) {
+            vidaPuntos = Math.max(0, vidaPuntos + puntosRestantes);
+            vidaInput.value = vidaPuntos;
+        } else if (ataqueInput === document.activeElement) {
+            ataquePuntos = Math.max(0, ataquePuntos + puntosRestantes);
+            ataqueInput.value = ataquePuntos;
+        } else if (defensaInput === document.activeElement) {
+            defensaPuntos = Math.max(0, defensaPuntos + puntosRestantes);
+            defensaInput.value = defensaPuntos;
+        }
+    }
+    
+    // Recalcular puntos restantes después del ajuste
+    const puntosFinales = PUNTOS_TOTALES - (vidaPuntos + ataquePuntos + defensaPuntos);
+    
+    // Actualizar indicador de puntos restantes
+    if (puntosRestantesSpan) {
+        puntosRestantesSpan.textContent = puntosFinales;
+        // Cambiar color según puntos restantes
+        if (puntosFinales === 0) {
+            puntosRestantesSpan.style.color = 'var(--accent-color)'; // Verde - todos usados
+        } else if (puntosFinales < 0) {
+            puntosRestantesSpan.style.color = 'var(--danger-color)'; // Rojo - excedido
+        } else {
+            puntosRestantesSpan.style.color = 'var(--secondary-color)'; // Amarillo - quedan puntos
+        }
+    }
+    
+    // Aplicar valores al jugador
+    // Vida base es 100, más los puntos invertidos
+    jugador.vidaMaxima = 100 + vidaPuntos;
+    jugador.vida = jugador.vidaMaxima;
+    jugador.ataqueBase = ataquePuntos;
+    jugador.defensaBase = defensaPuntos;
+    
     // Actualizar estadísticas en pantalla
     document.getElementById('puntos').textContent = jugador.puntos;
-    document.getElementById('vida').textContent = jugador.vida;
-    document.getElementById('ataque').textContent = jugador.ataqueTotal();
-    document.getElementById('defensa').textContent = jugador.defensaTotal();
+    document.getElementById('dinero').textContent = formatearPrecio(jugador.dinero);
     
     // Actualizar inventario visual
     updateInventoryDisplay();
@@ -324,6 +391,12 @@ function updateCart() {
     const cartItems = document.getElementById('productos-seleccionados');
     const cartTotal = document.getElementById('total-precio');
     const buyButton = document.getElementById('comprar-btn');
+    const dineroMercado = document.getElementById('dinero-mercado');
+    
+    // Actualizar dinero disponible en el mercado
+    if (dineroMercado && jugador) {
+        dineroMercado.textContent = formatearPrecio(jugador.dinero);
+    }
     
     if (productosSeleccionados.length === 0) {
         cartItems.innerHTML = 'Ningún producto seleccionado';
@@ -339,7 +412,14 @@ function updateCart() {
         
         const total = productosSeleccionados.reduce((sum, p) => sum + p.precioFinal, 0);
         cartTotal.textContent = formatearPrecio(total);
-        buyButton.disabled = false;
+        
+        // Deshabilitar si no tiene suficiente dinero
+        buyButton.disabled = jugador && total > jugador.dinero;
+        
+        // Mostrar advertencia si no alcanza el dinero
+        if (jugador && total > jugador.dinero) {
+            cartItems.innerHTML += `<div style="color: var(--danger-color); font-weight: bold; margin-top: 10px;">¡No tienes suficiente dinero!</div>`;
+        }
     }
 }
 
@@ -354,6 +434,19 @@ function updateCart() {
 window.buyItems = function() {
     // Validaciones básicas - no comprar si no hay jugador o productos seleccionados
     if (!jugador || productosSeleccionados.length === 0) return;
+    
+    // Calcular total de la compra
+    const totalCompra = productosSeleccionados.reduce((sum, p) => sum + p.precioFinal, 0);
+    
+    // Verificar si tiene suficiente dinero
+    if (jugador.dinero < totalCompra) {
+        alert('¡No tienes suficiente dinero para esta compra!');
+        return;
+    }
+    
+    // Restar el dinero del jugador
+    jugador.gastarDinero(totalCompra);
+    console.log(`Dinero gastado: ${formatearPrecio(totalCompra)}. Dinero restante: ${formatearPrecio(jugador.dinero)}`);
     
     console.log('Comprando productos:', productosSeleccionados); // Debug para desarrollo
     
@@ -930,14 +1023,26 @@ window.updatePlayerStats = updatePlayerStats;
 // === FUNCIÓN PARA ACTUALIZAR NOMBRE DEL JUGADOR ===
 
 /**
- * Actualiza el nombre del jugador desde el input de texto
- * y refresca las estadísticas en la interfaz.
+ * Actualiza el nombre del jugador desde el input de texto.
+ * Valida: máximo 20 caracteres y sin espacios.
  * @returns {void}
  */
 window.updatePlayerName = function() {
     const nameInput = document.getElementById('player-name');
     if (nameInput && jugador) {
-        jugador.nombre = nameInput.value || 'Aventurero';
+        // Eliminar espacios del nombre
+        let nombre = nameInput.value.replace(/\s/g, '');
+        
+        // Limitar a 20 caracteres
+        if (nombre.length > 20) {
+            nombre = nombre.substring(0, 20);
+        }
+        
+        // Actualizar el input con el valor limpio
+        nameInput.value = nombre;
+        
+        // Asignar al jugador (usar 'Aventurero' si está vacío)
+        jugador.nombre = nombre || 'Aventurero';
         updatePlayerStats();
     }
 };
@@ -960,6 +1065,24 @@ document.addEventListener('DOMContentLoaded', function() {
     if (nameInput) {
         nameInput.addEventListener('input', window.updatePlayerName);
         nameInput.addEventListener('blur', window.updatePlayerName);
+    }
+    
+    // Listeners para cambio de estadísticas (vida, ataque, defensa)
+    const vidaInput = document.getElementById('vida-input');
+    const ataqueInput = document.getElementById('ataque-input');
+    const defensaInput = document.getElementById('defensa-input');
+    
+    if (vidaInput) {
+        vidaInput.addEventListener('input', updatePlayerStats);
+        vidaInput.addEventListener('blur', updatePlayerStats);
+    }
+    if (ataqueInput) {
+        ataqueInput.addEventListener('input', updatePlayerStats);
+        ataqueInput.addEventListener('blur', updatePlayerStats);
+    }
+    if (defensaInput) {
+        defensaInput.addEventListener('input', updatePlayerStats);
+        defensaInput.addEventListener('blur', updatePlayerStats);
     }
     
     // Listener para botón de compra

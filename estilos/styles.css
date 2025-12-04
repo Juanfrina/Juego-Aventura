@@ -165,6 +165,23 @@ main {
     font-weight: bold;
 }
 
+/* Indicador de puntos disponibles para distribuir */
+.puntos-disponibles {
+    background-color: rgba(0,0,0,0.3);
+    border: 2px solid var(--secondary-color);
+    border-radius: 10px;
+    padding: 15px 25px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.puntos-valor {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+}
+
 /* Grid 2x2 para mostrar las estadísticas del jugador */
 .stats-container {
     display: grid;
@@ -197,6 +214,37 @@ main {
     font-size: 1.5rem;
     font-weight: bold;
     color: white;
+}
+
+/* Input para estadísticas editables (vida, ataque, defensa) */
+.stat-input {
+    width: 80px;
+    padding: 5px 8px;
+    border: 2px solid var(--secondary-color);
+    border-radius: 5px;
+    background-color: rgba(255,255,255,0.9);
+    color: black;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.stat-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px rgba(69, 211, 22, 0.5);
+}
+
+/* Quitar flechas de los inputs number */
+.stat-input::-webkit-outer-spin-button,
+.stat-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.stat-input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 /* === ESCENA 2: MERCADO === */
@@ -366,6 +414,17 @@ main {
     font-size: 1.2rem;
     font-weight: bold;
     color: var(--accent-color);
+}
+
+.dinero-disponible {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+    margin-top: 10px;
+    padding: 8px;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 5px;
 }
 
 /* === BOTONES === */

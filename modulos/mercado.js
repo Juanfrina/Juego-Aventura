@@ -35,6 +35,10 @@ export class Mercado {
         new Producto("Pocion Suprema", 800, "Epico", "consumible", { curacion: 100 }),
         new Producto("Espada Maldita", 2500, "Legendario", "arma", { ataque: 30 }),
         new Producto("Escudo Divino", 2200, "Legendario", "armadura", { defensa: 40 }),
+        // Añadir a listaProductos:
+        //new Producto("Anillo de Agilidad", 600, "Raro", "accesorio", { velocidad: 10 }),
+        //new Producto("Botas Aladas", 1200, "Epico", "accesorio", { velocidad: 20 }),
+        //new Producto("Capa del Viento", 2000, "Legendario", "accesorio", { velocidad: 35 }),
         new Producto("Nectar de Dioses", 1500, "Legendario", "consumible", { curacion: 150 })
     ];
 

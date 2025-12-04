@@ -66,6 +66,7 @@ export function batalla(player, enemy) {
 	// DETERMINAR GANADOR Y CALCULAR PUNTOS
 	let ganador;
 	let puntosGanados = 0;
+	let dinero = 5;
 
 	if (vidaJugador > 0 && vidaEnemigo <= 0) {
 		// EL JUGADOR GANA
@@ -75,11 +76,11 @@ export function batalla(player, enemy) {
 		// - 100 puntos base
 		// - + daño del enemigo
 		// - × multiplicador si es jefe
-		puntosGanados = 100 + ataqueEnemigo;
+		puntosGanados = 100 + ataqueEnemigo + dinero;
 		
 		// Si es un jefe final, multiplicar por su multiplicador
 		if (enemy instanceof JefeFinal) {
-			puntosGanados = Math.floor(puntosGanados * enemy.multiplicardanio);
+			puntosGanados = Math.floor(puntosGanados * enemy.multiplicardanio) + 10;
 			detalle += `🐉 ¡JEFE DERROTADO! Puntos × ${enemy.multiplicardanio} (multiplicador de jefe)\n`;
 		}
 
@@ -159,6 +160,7 @@ export function mostrarRanking(players = []) {
 		Victorias: p.victorias || 0,
 		Ataque: typeof p.ataqueTotal === 'function' ? p.ataqueTotal() : (p.nivelataque || 0),
 		Defensa: typeof p.defensaTotal === 'function' ? p.defensaTotal() : (p.defensa || 0),
+		Dinero: dinero,
 	}));
 
 	console.table(tabla);
@@ -220,9 +222,12 @@ export function mostrarReporteCompleto(rounds = [], players = []) {
 		console.log(` Ataque total: ${ataque}`);
 		console.log(` Defensa total: ${defensa}`);
 		console.log(` Inventario: ${inventario}`);
+		console.log(`Dinero total: ${dinero}`)
 	}
 
 	return { rondas: rounds.length, ranking: ordenados };
 }
+localStorage.setItem("nombre","nameInput", "puntos","puntosGanados", "dinero","jugador.dinero")
+
 
 export default { batalla, categorizePlayers, mostrarRanking };

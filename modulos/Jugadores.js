@@ -27,10 +27,25 @@ export class Jugadores {
      */
     vidaMaxima = 100;
     /**
+     * Ataque base del jugador (sin contar objetos)
+     * @type {number}
+     */
+    ataqueBase = 0;
+    /**
+     * Defensa base del jugador (sin contar objetos)
+     * @type {number}
+     */
+    defensaBase = 0;
+    /**
      * Inventario del jugador con todos los objetos
      * @type {Array<Object>}
      */
     inventario = [];
+    /**
+     * Dinero del jugador en céntimos (1000€ = 100000 céntimos)
+     * @type {number}
+     */
+    dinero = 50000; // 500€ en céntimos
     /**
      * Constructor de la clase Jugadores
      * @param {string} nombre - Nombre del jugador
@@ -40,8 +55,22 @@ export class Jugadores {
         this.puntos = 0;
         this.vida = this.vidaMaxima;
         this.vidaMaxima = 100;
+        this.ataqueBase = 0;
+        this.defensaBase = 0;
         this.inventario = [];
-
+        this.dinero = 50000; // 500€ en céntimos
+    }
+    /**
+     * Gasta dinero del jugador si tiene suficiente
+     * @param {number} cantidad - Cantidad a gastar en céntimos
+     * @returns {boolean} True si la compra fue exitosa, false si no tiene suficiente dinero
+     */
+    gastarDinero(cantidad) {
+        if (this.dinero >= cantidad) {
+            this.dinero -= cantidad;
+            return true;
+        }
+        return false;
     }
     /**
      * Añade un objeto al inventario del jugador (realiza copia del objeto)
@@ -70,7 +99,7 @@ export class Jugadores {
      * @returns {number} Ataque total del jugador (suma de todos los bonus de ataque)
      */
     ataqueTotal() {
-        let miAtaque = 0; // Empiezo con 0
+        let miAtaque = this.ataqueBase; // Empiezo con el ataque base
 
         // Busco todas mis armas
         for (let objeto of this.inventario) { // Recorro inventario
@@ -86,7 +115,7 @@ export class Jugadores {
      * @returns {number} Defensa total del jugador (suma de todos los bonus de defensa)
      */
     defensaTotal() {
-        let miDefensa = 0; // Empiezo con 0
+        let miDefensa = this.defensaBase; // Empiezo con la defensa base
 
         // Busco todas mis armaduras
         for (let objeto of this.inventario) {
@@ -113,6 +142,21 @@ export class Jugadores {
 
         return vidaTotal;
     }
+    /**
+     * Calcula la velocidad total del jugador sumando todos los consumibles que aumentan la velocidad
+     * @returns {number} Velocidad total del jugador (suma de bonus de velocidad de consumibles)
+     */
+    // velocidadTotal() {
+    //     let velocidadTotal = 0; // Empiezo con 0
+    //     // Busco todos los consumibles que aumentan la velocidad
+    //     for (let objeto of this.inventario) {
+    //         if (objeto.tipo === 'consumible') { // Si es consumible
+    //             velocidadTotal += objeto.velocidad ? objeto.velocidad : 0; // Sumo su velocidad si la tiene
+    //         }
+    //     }
+
+    //     return velocidadTotal;
+    // }
     /**
      * Agrupa el inventario del jugador por tipo de objeto
      * @returns {Object} Objeto con arrays de objetos agrupados por tipo {arma: [], armadura: [], consumible: []}
@@ -152,6 +196,8 @@ export class Jugadores {
             vidaTotal: this.vidaTotal(), // Vida total con bonus de consumibles
             ataque: this.ataqueTotal(),
             defensa: this.defensaTotal(),
+            dinero: this.dinero, // Dinero disponible en céntimos
+            //velocidad: this.velocidadTotal(),
             inventario: this.inventarioPorTipo()
         };
     }

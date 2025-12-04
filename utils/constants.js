@@ -17,17 +17,25 @@ export const ENEMIGOS = {
     GOBLIN: {
         nombre: 'Goblin',
         ataque: 15,
-        vida: 50
+        vida: 50,
+        dinero: 5
     },
     ORCO: {
         nombre: 'Orco',
         ataque: 25,
-        vida: 80
+        vida: 80,
+        dinero: 5
     },
+    // ESQUELETO: {
+    //     nombre: 'Esqueleto',
+    //     ataque: 30,
+    //     vida: 90
+    // },
     TROLL: {
         nombre: 'Troll',
         ataque: 35,
-        vida: 100
+        vida: 100,
+        dinero: 5
     }
 };
 
@@ -45,7 +53,8 @@ export const JEFE_FINAL = {
     ataque: 50,
     vida: 150,
     habilidad: 'Llamarada',
-    multiplicadorDanio: 1.5
+    multiplicadorDanio: 1.5,
+    dinero: 10
 };
 
 /**
@@ -57,7 +66,7 @@ export const JEFE_FINAL = {
  */
 export const JUGADOR = {
     VIDA_INICIAL: 100,
-    VIDA_MAXIMA: 100,
+    VIDA_MAXIMA: 110,
     PUNTOS_INICIALES: 0
 };
 
@@ -132,6 +141,7 @@ export const IMAGENES = {
     CONSUMIBLE: 'imagenes/consumible.png',
     GOBLIN: 'imagenes/Goblin.jpg',
     ORCO: 'imagenes/Orco.jpg',
+    // ESQUELETO: 'imagenes/Esqueleto.jpg',
     TROLL: 'imagenes/Troll.jpg',
     DRAGON: 'imagenes/Dragon.jpg'
 };
