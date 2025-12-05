@@ -254,6 +254,12 @@ function updatePlayerStats() {
     document.getElementById('puntos').textContent = jugador.puntos;
     document.getElementById('dinero').textContent = formatearPrecio(jugador.dinero);
     
+    // Actualizar indicador de dinero fijo
+    const moneyDisplay = document.getElementById('money-display');
+    if (moneyDisplay) {
+        moneyDisplay.textContent = formatearPrecio(jugador.dinero);
+    }
+    
     // Actualizar inventario visual
     updateInventoryDisplay();
 }
@@ -320,8 +326,9 @@ function createProductCard(producto, descuento) {
     
     // Determinar imagen según tipo usando función utilitaria
     const imageSrc = obtenerImagenPorTipo(producto.tipo);
-    
+    //<div class="cover">🔍 Ver</div>
     card.innerHTML = `
+        
         <img src="${imageSrc}" alt="${producto.nombre}">
         <h4 class="producto-nombre">${producto.nombre}</h4>
         <div class="producto-info">
@@ -392,10 +399,16 @@ function updateCart() {
     const cartTotal = document.getElementById('total-precio');
     const buyButton = document.getElementById('comprar-btn');
     const dineroMercado = document.getElementById('dinero-mercado');
+    const moneyDisplay = document.getElementById('money-display');
     
     // Actualizar dinero disponible en el mercado
     if (dineroMercado && jugador) {
         dineroMercado.textContent = formatearPrecio(jugador.dinero);
+    }
+    
+    // Actualizar indicador de dinero fijo
+    if (moneyDisplay && jugador) {
+        moneyDisplay.textContent = formatearPrecio(jugador.dinero);
     }
     
     if (productosSeleccionados.length === 0) {
@@ -927,10 +940,16 @@ function showFinalResults() {
     finalClassification.textContent = clasificacionTexto;
     finalPointsText.textContent = `${jugador.puntos} puntos`;
     
-    // Actualizar el resumen estadístico de la partida
-    document.getElementById('battles-won').textContent = batallasGanadas;      // Batallas ganadas
-    document.getElementById('items-obtained').textContent = objetosComprados; // Objetos comprados
-    document.getElementById('final-level').textContent = clasificacionNivel;  // Nivel final
+    // Actualizar la TABLA DE RANKING
+    document.getElementById('rank-nombre').textContent = jugador.nombre;
+    document.getElementById('rank-puntos').textContent = jugador.puntos;
+    document.getElementById('rank-dinero').textContent = formatearPrecio(jugador.dinero);
+    document.getElementById('rank-batallas').textContent = `${batallasGanadas}/${totalEnemigos}`;
+    document.getElementById('rank-vida').textContent = `${jugador.vida}/${jugador.vidaMaxima}`;
+    document.getElementById('rank-ataque').textContent = jugador.ataqueTotal();
+    document.getElementById('rank-defensa').textContent = jugador.defensaTotal();
+    document.getElementById('rank-objetos').textContent = objetosComprados;
+    document.getElementById('rank-nivel').textContent = clasificacionNivel;
     
     console.log(`Clasificación final: ${clasificacionTexto}`);
     
@@ -991,6 +1010,8 @@ function updateInventoryDisplay() {
     
     // Recorrer cada slot del inventario visual
     inventarioItems.forEach((img, index) => {
+        const slot = img.parentElement; // El div .item que contiene la imagen
+        
         // Verificar si hay un objeto en esta posición del inventario del jugador
         if (jugador && jugador.inventario && jugador.inventario[index]) {
             // SLOT OCUPADO - hay un objeto aquí
@@ -1004,14 +1025,20 @@ function updateInventoryDisplay() {
             img.alt = item.nombre;  // Texto alternativo con el nombre del objeto
             img.style.opacity = '1';
             img.style.display = 'block';
-            img.parentElement.style.backgroundColor = 'var(--secondary-color)'; // Fondo dorado
+            slot.style.backgroundColor = 'var(--secondary-color)'; // Fondo dorado
+            
+            // Añadir tooltip con información del objeto
+            slot.setAttribute('data-tooltip', `${item.nombre} - ${item.tipo}`);
         } else {
             // SLOT VACÍO - no hay objeto en esta posición
             img.src = '';                    // Sin imagen
             img.alt = 'Slot vacío';
             img.style.opacity = '0';         // Invisible
             img.style.display = 'none';      // Oculto
-            img.parentElement.style.backgroundColor = 'rgba(241, 222, 9, 0.3)'; // Fondo semi-transparente
+            slot.style.backgroundColor = 'rgba(241, 222, 9, 0.3)'; // Fondo semi-transparente
+            
+            // Quitar tooltip del slot vacío
+            slot.removeAttribute('data-tooltip');
         }
     });
 }

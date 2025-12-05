@@ -41,6 +41,60 @@
     }
 }
 
+/* Animación de pulso para botones */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+/* Animación de temblor/shake */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Animación de brillo */
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 5px rgba(255, 68, 68, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(255, 68, 68, 0.8); }
+}
+
+/* Animación de entrada desde la izquierda para el dinero */
+@keyframes slideInMoney {
+    0% {
+        transform: translateX(-150%);
+        opacity: 0;
+    }
+    70% {
+        transform: translateX(10%);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fallCoin{
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
 /* Reset CSS - quitamos márgenes y paddings por defecto del navegador */
 * {
     box-sizing: border-box; /* Para que padding y border se incluyan en el tamaño total */
@@ -79,6 +133,40 @@ body {
     font-family: Arial, sans-serif;
     color: white; /* Texto blanco por defecto para contraste con fondo oscuro */
 }
+
+
+.fallCoin{
+    width: 100px;
+    height: 100px;
+    animation: fallCoin;
+}
+
+.money-indicator {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    position: fixed;
+    bottom: 100px;
+    left: 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+    animation: slideInMoney 1s ease-out forwards;
+}
+
+
+.money-indicator .money-amount{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #000;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+    text-align: center;
+}
+
 
 /* === HEADER === */
 /* Cabecera fija con el título del juego */
@@ -291,12 +379,39 @@ main {
     cursor: pointer;                /* Cursor de mano para indicar que es clickeable */
     transition: all 0.3s ease;     /* Animación suave para hover */
     position: relative;
+    overflow: hidden;               /* Para que la cover no se salga */
+}
+
+/* Cover/Cubierta que se voltea al hacer hover */
+.producto-card .cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    transform-origin: left center;
+    transition: transform 0.6s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 1.2em;
+    color: var(--secondary-color);
+    border-radius: 8px;
+    z-index: 5;
+}
+
+/* Al hacer hover, la cover se abre como una puerta */
+.producto-card:hover .cover {
+    transform: rotateY(-110deg);
 }
 
 /* Efecto hover - se eleva al pasar el mouse */
 .producto-card:hover {
     transform: translateY(-3px);               /* Se mueve hacia arriba */
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);  /* Sombra para efecto 3D */
+    animation: shake 0.5s ease-in-out; /* Efecto de temblor */
 }
 
 /* Estado seleccionado - cambia a verde cuando se clickea */
@@ -494,6 +609,49 @@ footer {
     border-radius: 5px;
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición suave */
     cursor: pointer;
+    position: relative;       /* Para posicionar el tooltip */
+}
+
+/* Tooltip - descripción del item */
+.item::after {
+    content: attr(data-tooltip); /* Toma el texto del atributo data-tooltip */
+    position: absolute;
+    bottom: 100%;              /* Arriba del item */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    opacity: 0;                /* Invisible por defecto */
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 100;
+    pointer-events: none;      /* No interfiere con clicks */
+}
+
+/* Flecha del tooltip */
+.item::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% - 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 100;
+}
+
+/* Mostrar tooltip solo si tiene contenido */
+.item[data-tooltip]:hover::after,
+.item[data-tooltip]:hover::before {
+    opacity: 1;
+    visibility: visible;
 }
 
 /* Animación hover: agrandar slot del inventario */
@@ -628,6 +786,7 @@ footer {
 .enemy-card.boss {
     border-color: #ff0000;
     background-color: rgba(255,0,0,0.2);
+    animation: glow 2s infinite ease-in-out; /* Brillo para destacar al jefe */
 }
 
 .enemy-image {
@@ -832,11 +991,13 @@ footer {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
+    animation: pulse 1.5s infinite ease-in-out; /* Pulso continuo */
 }
 
 .battle-btn:hover {
     background-color: #ff0000;
     transform: translateY(-2px);
+    animation: none; /* Parar pulso en hover */
 }
 
 .hidden {
@@ -948,6 +1109,82 @@ footer {
 .restart-btn:hover {
     background-color: #2d8f0f;
     transform: translateY(-2px);
+}
+
+/* === TABLA DE RANKING === */
+.ranking-container {
+    background-color: rgba(255,255,255,0.1);
+    border: 2px solid var(--secondary-color);
+    border-radius: 10px;
+    padding: 25px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.ranking-container h3 {
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.ranking-table thead {
+    background-color: var(--secondary-color);
+}
+
+.ranking-table th {
+    color: black;
+    font-weight: bold;
+    padding: 12px 15px;
+    text-align: left;
+    font-size: 1rem;
+}
+
+.ranking-table tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    transition: background-color 0.3s ease;
+}
+
+.ranking-table tbody tr:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.ranking-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.ranking-table td {
+    padding: 12px 15px;
+    color: white;
+}
+
+.ranking-table td:first-child {
+    color: #ccc;
+    font-weight: 500;
+}
+
+.ranking-table td:last-child {
+    font-weight: bold;
+    color: var(--secondary-color);
+    text-align: right;
+}
+
+/* Fila especial para el nivel final */
+.ranking-table tr.ranking-nivel {
+    background-color: rgba(69, 211, 22, 0.2);
+}
+
+.ranking-table tr.ranking-nivel td:last-child {
+    color: var(--accent-color);
+    font-size: 1.1rem;
 }
 
 /* === RESPONSIVE DESIGN === */
