@@ -17,14 +17,12 @@ export const ENEMIGOS = {
     GOBLIN: {
         nombre: 'Goblin',
         ataque: 15,
-        vida: 50,
-        dinero: 5
+        vida: 50
     },
     ORCO: {
         nombre: 'Orco',
         ataque: 25,
-        vida: 80,
-        dinero: 5
+        vida: 80
     },
     // ESQUELETO: {
     //     nombre: 'Esqueleto',
@@ -34,8 +32,7 @@ export const ENEMIGOS = {
     TROLL: {
         nombre: 'Troll',
         ataque: 35,
-        vida: 100,
-        dinero: 5
+        vida: 100
     }
 };
 
@@ -53,8 +50,7 @@ export const JEFE_FINAL = {
     ataque: 50,
     vida: 150,
     habilidad: 'Llamarada',
-    multiplicadorDanio: 1.5,
-    dinero: 10
+    multiplicadorDanio: 1.5
 };
 
 /**

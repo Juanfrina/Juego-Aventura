@@ -16,6 +16,15 @@
 </head>
 
 <body>
+
+
+    <div class="money-indicator" id="money-indicator">
+        <img src="imagenes/monedero.png" alt="">
+        <div>
+            <span class="money-amount" id="money-display">500€</span>
+        </div>
+    </div>
+
     <!-- Cabecera del juego - siempre visible arriba -->
     <header>
         <h1>Bienvenido a la Aventura del Reino</h1>
@@ -92,6 +101,7 @@
             <!-- Muestra 9 productos aleatorios de los 24 disponibles -->
             <div class="productos-grid" id="productos-grid">
                 <!-- Los productos se generarán dinámicamente -->
+                 <div class="cover">1</div>
             </div>
             
             <!-- Carrito de compras - muestra lo que el jugador ha seleccionado -->
@@ -239,26 +249,56 @@
                         <span id="final-points-text">0 puntos</span>
                     </div>
                 </div>
-                <!-- Resumen estadístico de toda la partida -->
-                <div class="final-summary">
-                    <h3>Resumen de la Aventura</h3>
-                    <div id="adventure-summary">
-                        <div class="summary-item">
-                            <span>Batallas ganadas:</span>
-                            <!-- De 4 batallas totales (3 enemigos + 1 jefe) -->
-                            <span id="battles-won">0</span>
-                        </div>
-                        <div class="summary-item">
-                            <span>Objetos obtenidos:</span>
-                            <!-- Contador de objetos comprados en el mercado -->
-                            <span id="items-obtained">0</span>
-                        </div>
-                        <div class="summary-item">
-                            <span>Nivel final:</span>
-                            <!-- PRO / A medias / Perdedor -->
-                            <span id="final-level">Rookie</span>
-                        </div>
-                    </div>
+                
+                <!-- TABLA DE RANKING -->
+                <div class="ranking-container">
+                    <h3>📊 Ranking Final</h3>
+                    <table class="ranking-table">
+                        <thead>
+                            <tr>
+                                <th>Estadística</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ranking-tbody">
+                            <tr>
+                                <td>👤 Nombre</td>
+                                <td id="rank-nombre">Jugador</td>
+                            </tr>
+                            <tr>
+                                <td>⭐ Puntos Totales</td>
+                                <td id="rank-puntos">0</td>
+                            </tr>
+                            <tr>
+                                <td>💰 Dinero Final</td>
+                                <td id="rank-dinero">0€</td>
+                            </tr>
+                            <tr>
+                                <td>⚔️ Batallas Ganadas</td>
+                                <td id="rank-batallas">0/4</td>
+                            </tr>
+                            <tr>
+                                <td>❤️ Vida Final</td>
+                                <td id="rank-vida">0</td>
+                            </tr>
+                            <tr>
+                                <td>🗡️ Ataque Total</td>
+                                <td id="rank-ataque">0</td>
+                            </tr>
+                            <tr>
+                                <td>🛡️ Defensa Total</td>
+                                <td id="rank-defensa">0</td>
+                            </tr>
+                            <tr>
+                                <td>🎒 Objetos Comprados</td>
+                                <td id="rank-objetos">0</td>
+                            </tr>
+                            <tr class="ranking-nivel">
+                                <td>🏆 Nivel Final</td>
+                                <td id="rank-nivel">Rookie</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <!-- Botón para volver a empezar - reinicia todo el juego -->
@@ -300,6 +340,19 @@
             </div>
         </div>
     </template>
+
+    <!-- Contenedor para las monedas cayendo -->
+    <div class="falling-coins-container" id="falling-coins">
+        <div class="falling-coin coin-1">
+            <img src="imagenes/moneda.png" alt="Moneda">
+        </div>
+        <div class="falling-coin coin-2">
+            <img src="imagenes/moneda.png" alt="Moneda">
+        </div>
+        <div class="falling-coin coin-3">
+            <img src="imagenes/moneda.png" alt="Moneda">
+        </div>
+    </div>
 </body>
 
 </html>
