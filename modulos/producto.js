@@ -13,7 +13,7 @@ export class Producto {
     /**
     * Crea un nuevo producto con las propiedades indicadas
     * @param {string} nombre - Nombre del producto
-    * @param {number} precio - Precio en céntimos (sin decimales)
+    * @param {number} precio - Precio en monedas (número entero)
     * @param {string} rareza - Rareza del producto (Comun, Raro, Epico, Legendario)
     * @param {string} tipo - Tipo de producto (arma, armadura, consumible)
     * @param {Object} bonus - Bonus que otorga el producto
@@ -39,11 +39,11 @@ export class Producto {
     }
 
     /**
-    * Formatea el precio de céntimos a euros
-    * @returns {string} Precio formateado en euros (ejemplo: "9.50€")
+    * Formatea el precio como número entero
+    * @returns {string} Precio formateado (ejemplo: "50")
     */
     formatearPrecio() {
-        return (this.precio / 100).toFixed(2) + "€";
+        return Math.floor(this.precio).toString();
     }
 
     /**

@@ -104,10 +104,11 @@
     padding: 0;
 }
 
-/* Prevenir scroll horizontal en todas las pantallas */
+/* Prevenir scroll en la página - SPA */
 html, body {
     max-width: 100%;
-    overflow-x: hidden;
+    height: 100vh;
+    overflow: hidden; /* Sin scroll en la página principal */
 }
 
 /* Asegurar que las imágenes no se salgan del contenedor */
@@ -125,15 +126,20 @@ img {
     --danger-color: red;           /* Rojo - para enemigos y peligro */
 }
 
-/* Layout principal usando CSS Grid */
-/* Header arriba, main en el centro (flexible), footer abajo */
+/* Layout principal usando CSS Grid - Estructura SPA */
+/* Header 10vh, main 70vh, footer 20vh */
 body {
+    /* Fondo con patrón de 16x16 píxeles que se repite */
     background-color: var(--primary-color);
-    min-height: 100vh; /* Ocupa toda la altura de la ventana */
+    background-image: url('../imagenes/pattern.png');
+    background-repeat: repeat;
+    background-size: 16px 16px;
+    height: 100vh; /* Altura fija de la ventana */
     display: grid;
-    grid-template-rows: auto 1fr auto; /* Header automático, main flexible, footer automático */
+    grid-template-rows: 10vh 70vh 20vh; /* Header 10vh, main 70vh, footer 20vh */
     font-family: Arial, sans-serif;
     color: white; /* Texto blanco por defecto para contraste con fondo oscuro */
+    overflow: hidden; /* Sin scroll en body */
 }
 
 
@@ -177,26 +183,32 @@ body {
 
 
 /* === HEADER === */
-/* Cabecera fija con el título del juego */
+/* Cabecera fija con altura de 10vh */
 header {
     display: flex;
     justify-content: center; /* Centrar el título */
-    padding: 20px;
-    background-color: rgba(0,0,0,0.3); /* Fondo semi-transparente para darle profundidad */
+    align-items: center;
+    height: 10vh; /* Altura fija del header */
+    padding: 0 20px;
+    background-color: rgba(0,0,0,0.5); /* Fondo semi-transparente */
 }
 
 header h1 {
     color: var(--secondary-color); /* Amarillo dorado para destacar */
-    font-size: 2rem;
+    font-size: clamp(1.2rem, 3vw, 2rem); /* Tamaño responsive */
+    text-align: center;
 }
 
 /* === MAIN === */
-/* Contenedor principal que centra las escenas */
+/* Contenedor principal con altura de 70vh y scroll interno */
 main {
-    margin: 20px;
+    height: 70vh; /* Altura fija del main */
+    padding: 10px 20px;
     display: flex;
     justify-content: center; /* Centrar horizontalmente */
-    align-items: center;     /* Centrar verticalmente */
+    align-items: flex-start; /* Alinear arriba para scroll */
+    overflow-y: auto; /* Scroll solo dentro del main cuando sea necesario */
+    overflow-x: hidden;
 }
 
 /* === SISTEMA DE ESCENAS === */
@@ -204,13 +216,14 @@ main {
 .scene {
     display: none; /* Por defecto todas las escenas están ocultas */
     width: 100%;
-    max-width: 800px; /* Ancho máximo para que no se vea mal en pantallas grandes */
-    background-color: rgba(255,255,255,0.1); /* Fondo semi-transparente */
-    border: 2px solid black;
+    max-width: 900px; /* Ancho máximo para que no se vea mal en pantallas grandes */
+    background-color: rgba(0,0,0,0.7); /* Fondo oscuro semi-transparente */
+    border: 2px solid var(--secondary-color);
     border-radius: 15px; /* Bordes redondeados para look moderno */
-    padding: 30px;
+    padding: 20px;
     text-align: center;
     box-sizing: border-box; /* Importante para que padding no cause overflow */
+    margin: 10px auto;
 }
 
 /* Solo la escena con clase "active" se muestra */
@@ -588,21 +601,25 @@ main {
 }
 
 /* === FOOTER/INVENTARIO === */
-/* Inventario visual fijo en la parte inferior - siempre visible */
+/* Inventario visual fijo con altura de 20vh - siempre visible */
 footer {
     display: flex;
     justify-content: center; /* Centrar el inventario */
-    padding: 15px;
-    background-color: rgba(0,0,0,0.3); /* Fondo semi-transparente */
+    align-items: center;
+    height: 20vh; /* Altura fija del footer */
+    padding: 10px;
+    background-color: rgba(0,0,0,0.5); /* Fondo semi-transparente */
 }
 
 /* Contenedor principal del inventario - 6 slots horizontales */
 #inventario-contenedor {
-    background-color: var(--primary-color);
+    background-color: rgba(0,0,0,0.3);
+    border: 2px solid var(--secondary-color);
+    border-radius: 10px;
     display: flex;            /* Los slots en línea horizontal */
-    margin: 8px 20%;         /* Márgenes laterales */
-    padding: 8px;
-    gap: 4px;                /* Pequeño espacio entre slots */
+    padding: 10px;
+    gap: 8px;                /* Espacio entre slots */
+    max-width: 90%;
 }
 
 /* Cada slot individual del inventario */
@@ -1124,16 +1141,16 @@ footer {
     background-color: rgba(255,255,255,0.1);
     border: 2px solid var(--secondary-color);
     border-radius: 10px;
-    padding: 25px;
+    padding: 15px;
     width: 100%;
     max-width: 500px;
 }
 
 .ranking-container h3 {
     color: var(--secondary-color);
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 }
 
 .ranking-table {
@@ -1151,9 +1168,9 @@ footer {
 .ranking-table th {
     color: black;
     font-weight: bold;
-    padding: 12px 15px;
+    padding: 10px 12px;
     text-align: left;
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
 
 .ranking-table tbody tr {
@@ -1162,7 +1179,7 @@ footer {
 }
 
 .ranking-table tbody tr:hover {
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255,255,255,0.15);
 }
 
 .ranking-table tbody tr:last-child {
@@ -1170,7 +1187,7 @@ footer {
 }
 
 .ranking-table td {
-    padding: 12px 15px;
+    padding: 10px 12px;
     color: white;
 }
 
@@ -1193,6 +1210,95 @@ footer {
 .ranking-table tr.ranking-nivel td:last-child {
     color: var(--accent-color);
     font-size: 1.1rem;
+}
+
+/* === TABLA DE HISTORIAL DE JUGADORES CON SCROLL === */
+.historial-container {
+    margin-top: 15px;
+    max-height: 250px; /* Altura máxima para activar scroll */
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 500px; /* Ancho máximo para que quede centrado */
+}
+
+.historial-container h3 {
+    color: var(--accent-color);
+    position: sticky;
+    top: 0;
+    background-color: rgba(0,0,0,0.8);
+    padding: 10px;
+    margin: -15px -15px 10px -15px;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Contenedor con scroll para la tabla de historial */
+.historial-table-wrapper {
+    max-height: 180px; /* Altura para scroll */
+    overflow-y: auto;
+    border-radius: 0 0 8px 8px;
+}
+
+.historial-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.historial-table thead {
+    background-color: var(--accent-color);
+    position: sticky; /* Cabecera fija */
+    top: 0;
+    z-index: 10;
+}
+
+.historial-table th {
+    color: white;
+    text-align: center;
+    padding: 10px 8px;
+    font-size: 0.9rem;
+}
+
+.historial-table tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+/* Filas pares de diferente color que impares */
+.historial-table tbody tr:nth-child(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.historial-table tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.historial-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.historial-table td {
+    text-align: center;
+    padding: 8px;
+}
+
+.historial-table td:first-child {
+    color: white;
+    font-weight: bold;
+}
+
+.historial-table td:nth-child(2) {
+    color: var(--secondary-color);
+    font-weight: bold;
+}
+
+.historial-table td:last-child {
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+/* Fila del jugador actual destacada */
+.historial-table tr.jugador-actual {
+    background-color: rgba(241, 222, 9, 0.3) !important;
+    border: 2px solid var(--secondary-color);
 }
 
 /* === RESPONSIVE DESIGN === */
@@ -1546,6 +1652,7 @@ footer {
     pointer-events: none;  /* No bloquea clics */
     z-index: 9999;
     overflow: hidden;
+    display: none;  /* Oculto por defecto - se muestra con JS */
 }
 
 /* Estilo base de las monedas */

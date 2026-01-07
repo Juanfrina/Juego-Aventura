@@ -31,12 +31,12 @@ export function calcularDescuentoAleatorio(rareza) {
 }
 
 /**
- * Formatea un precio de céntimos a euros
- * @param {number} centimos - Precio en céntimos
- * @returns {string} Precio formateado (ej: "12.50€")
+ * Formatea un precio mostrando solo el número entero
+ * @param {number} monedas - Cantidad de monedas
+ * @returns {string} Precio formateado (ej: "500")
  */
-export function formatearPrecio(centimos) {
-    return (centimos / 100).toFixed(2) + '€';
+export function formatearPrecio(monedas) {
+    return Math.floor(monedas).toString();
 }
 
 /**

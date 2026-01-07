@@ -140,28 +140,36 @@ window.showScene = function(sceneId) {
     // Ejecutamos acciones específicas según la escena que se va a mostrar
     switch(sceneId) {
         case 'scene1':
-            // Escena inicial - actualizar stats del jugador
+            // Escena 1: Formulario de creación del personaje
             updatePlayerStats();
             break;
         case 'scene2':
-            // Mercado - generar productos aleatorios y descuentos
-            initializeMarket();
+            // Escena 2: Tarjeta del jugador (preview antes del mercado)
+            updateScene2();
             break;
         case 'scene3':
-            // Estado post-compra - mostrar cómo quedó el jugador
-            updateScene3();
+            // Escena 3: Mercado - generar productos aleatorios y descuentos
+            initializeMarket();
             break;
         case 'scene4':
-            // Galería de enemigos - mostrar todos los enemigos con sus imágenes
-            initializeEnemies();
+            // Escena 4: Tarjeta del jugador actualizada (post-compra)
+            updateScene4();
             break;
         case 'scene5':
-            // Arena de combate - preparar el sistema de batallas
-            initializeBattles();
+            // Escena 5: Galería de enemigos - mostrar todos los enemigos
+            initializeEnemies();
             break;
         case 'scene6':
-            // Resultado final - calcular y mostrar clasificación
+            // Escena 6: Arena de combate - sistema de batallas
+            initializeBattles();
+            break;
+        case 'scene7':
+            // Escena 7: Resultado final - clasificación
             showFinalResults();
+            break;
+        case 'scene8':
+            // Escena 8: Ranking (historial de jugadores)
+            loadHistorial();
             break;
     }
 };
@@ -361,11 +369,22 @@ function toggleProductSelection(card, producto, precio) {
     const isSelected = card.classList.contains('selected');
     
     if (isSelected) {
-        // Deseleccionar
+        // Deseleccionar - siempre permitido
         card.classList.remove('selected');
         productosSeleccionados = productosSeleccionados.filter(p => p.nombre !== producto.nombre);
     } else {
-        // Seleccionar
+        // Calcular el total actual del carrito + el nuevo producto
+        const totalActual = productosSeleccionados.reduce((sum, p) => sum + p.precioFinal, 0);
+        const nuevoTotal = totalActual + precio;
+        
+        // Validar que hay suficiente dinero disponible
+        if (jugador && nuevoTotal > jugador.dinero) {
+            // No tiene suficiente dinero - mostrar aviso
+            alert(`¡No tienes suficiente dinero!\nDinero disponible: ${formatearPrecio(jugador.dinero)}\nTotal en carrito: ${formatearPrecio(nuevoTotal)}`);
+            return; // No añadir el producto
+        }
+        
+        // Seleccionar - tiene suficiente dinero
         card.classList.add('selected');
         productosSeleccionados.push({
             ...producto,
@@ -391,7 +410,7 @@ function toggleProductSelection(card, producto, precio) {
 
 /**
  * Actualiza la interfaz del carrito mostrando los productos seleccionados,
- * el total y habilitando/deshabilitando el botón de compra.
+ * el total, el dinero disponible restante y habilitando/deshabilitando el botón de compra.
  * @returns {void}
  */
 function updateCart() {
@@ -401,20 +420,32 @@ function updateCart() {
     const dineroMercado = document.getElementById('dinero-mercado');
     const moneyDisplay = document.getElementById('money-display');
     
-    // Actualizar dinero disponible en el mercado
+    // Calcular el total del carrito
+    const totalCarrito = productosSeleccionados.reduce((sum, p) => sum + p.precioFinal, 0);
+    
+    // Calcular dinero disponible restante (dinero actual - lo que hay en el carrito)
+    const dineroRestante = jugador ? jugador.dinero - totalCarrito : 0;
+    
+    // Actualizar dinero disponible en el mercado (muestra lo que quedaría tras la compra)
     if (dineroMercado && jugador) {
-        dineroMercado.textContent = formatearPrecio(jugador.dinero);
+        dineroMercado.textContent = formatearPrecio(dineroRestante);
+        // Cambiar color si está en negativo o muy bajo
+        dineroMercado.style.color = dineroRestante < 0 ? 'var(--danger-color)' : '';
     }
     
-    // Actualizar indicador de dinero fijo
+    // Actualizar indicador de dinero fijo (muestra el dinero real del jugador)
     if (moneyDisplay && jugador) {
         moneyDisplay.textContent = formatearPrecio(jugador.dinero);
     }
     
     if (productosSeleccionados.length === 0) {
         cartItems.innerHTML = 'Ningún producto seleccionado';
-        cartTotal.textContent = '0€';
+        cartTotal.textContent = '0';
         buyButton.disabled = true;
+        // Restaurar el color del dinero disponible
+        if (dineroMercado) {
+            dineroMercado.style.color = '';
+        }
     } else {
         cartItems.innerHTML = productosSeleccionados.map(p => 
             `<div class="producto-seleccionado">
@@ -423,14 +454,13 @@ function updateCart() {
             </div>`
         ).join('');
         
-        const total = productosSeleccionados.reduce((sum, p) => sum + p.precioFinal, 0);
-        cartTotal.textContent = formatearPrecio(total);
+        cartTotal.textContent = formatearPrecio(totalCarrito);
         
         // Deshabilitar si no tiene suficiente dinero
-        buyButton.disabled = jugador && total > jugador.dinero;
+        buyButton.disabled = jugador && totalCarrito > jugador.dinero;
         
         // Mostrar advertencia si no alcanza el dinero
-        if (jugador && total > jugador.dinero) {
+        if (jugador && totalCarrito > jugador.dinero) {
             cartItems.innerHTML += `<div style="color: var(--danger-color); font-weight: bold; margin-top: 10px;">¡No tienes suficiente dinero!</div>`;
         }
     }
@@ -508,19 +538,43 @@ window.buyItems = function() {
 // === ESCENA 3: ACTUALIZAR ESTADO ACTUAL ===
 
 /**
- * Actualiza la escena 3 con el estado actual del jugador
+ * Actualiza la escena 2 con la tarjeta del jugador (preview antes del mercado)
+ * mostrando los stats iniciales del personaje creado.
+ * @returns {void}
+ */
+function updateScene2() {
+    if (!jugador) return;
+    
+    // Actualizar información del jugador en scene2
+    const playerNameScene2 = document.getElementById('player-name-scene2');
+    const puntosScene2 = document.getElementById('puntos-scene2');
+    const vidaScene2 = document.getElementById('vida-scene2');
+    const ataqueScene2 = document.getElementById('ataque-scene2');
+    const defensaScene2 = document.getElementById('defensa-scene2');
+    const dineroScene2 = document.getElementById('dinero-scene2');
+    
+    if (playerNameScene2) playerNameScene2.textContent = jugador.nombre;
+    if (puntosScene2) puntosScene2.textContent = jugador.puntos;
+    if (vidaScene2) vidaScene2.textContent = `${jugador.vida}/${jugador.vidaMaxima}`;
+    if (ataqueScene2) ataqueScene2.textContent = jugador.ataqueTotal();
+    if (defensaScene2) defensaScene2.textContent = jugador.defensaTotal();
+    if (dineroScene2) dineroScene2.textContent = formatearPrecio(jugador.dinero);
+}
+
+/**
+ * Actualiza la escena 4 con el estado actual del jugador después del mercado
  * mostrando puntos, vida, ataque, defensa y objetos comprados.
  * @returns {void}
  */
-function updateScene3() {
+function updateScene4() {
     if (!jugador) return;
     
     // Actualizar información del jugador
-    document.getElementById('player-name-scene3').textContent = jugador.nombre;
-    document.getElementById('puntos-scene3').textContent = jugador.puntos;
-    document.getElementById('vida-scene3').textContent = `${jugador.vida}/${jugador.vidaMaxima}`;
-    document.getElementById('ataque-scene3').textContent = jugador.ataqueTotal();
-    document.getElementById('defensa-scene3').textContent = jugador.defensaTotal();
+    document.getElementById('player-name-scene4').textContent = jugador.nombre;
+    document.getElementById('puntos-scene4').textContent = jugador.puntos;
+    document.getElementById('vida-scene4').textContent = `${jugador.vida}/${jugador.vidaMaxima}`;
+    document.getElementById('ataque-scene4').textContent = jugador.ataqueTotal();
+    document.getElementById('defensa-scene4').textContent = jugador.defensaTotal();
     
     // Mostrar objetos comprados
     const itemsComprados = document.getElementById('items-comprados');
@@ -953,8 +1007,11 @@ function showFinalResults() {
     
     console.log(`Clasificación final: ${clasificacionTexto}`);
     
-    // Animación de confetti si es PRO
+    // Animación de confetti y monedas cayendo si es PRO
     if (batallasGanadas === totalEnemigos && typeof confetti !== 'undefined') {
+        // Mostrar monedas cayendo
+        showFallingCoins();
+        
         // Lanzar confetti múltiples veces para efecto dramático
         const duration = 3000; // 3 segundos
         const end = Date.now() + duration;
@@ -980,6 +1037,151 @@ function showFinalResults() {
             });
         }, 250);
     }
+    
+    // Guardar jugador actual en LocalStorage y mostrar historial
+    guardarJugadorEnHistorial();
+    mostrarHistorialJugadores();
+}
+
+/**
+ * Guarda el jugador actual en el historial de LocalStorage
+ * @returns {void}
+ */
+function guardarJugadorEnHistorial() {
+    // Obtener historial existente o crear array vacío
+    let historial = JSON.parse(localStorage.getItem('historialJugadores')) || [];
+    
+    // Crear objeto con datos del jugador actual
+    const jugadorActual = {
+        nombre: jugador.nombre,
+        puntuacion: jugador.puntos,
+        monedas: jugador.dinero,
+        fecha: new Date().toISOString()
+    };
+    
+    // Añadir al historial
+    historial.push(jugadorActual);
+    
+    // Guardar en LocalStorage
+    localStorage.setItem('historialJugadores', JSON.stringify(historial));
+    
+    console.log('Jugador guardado en historial:', jugadorActual);
+}
+
+/**
+ * Muestra el historial de jugadores en la tabla de la escena final
+ * Ordena por puntuación de mayor a menor
+ * @returns {void}
+ */
+function mostrarHistorialJugadores() {
+    const tbody = document.getElementById('historial-tbody');
+    if (!tbody) return;
+    
+    // Obtener historial de LocalStorage
+    let historial = JSON.parse(localStorage.getItem('historialJugadores')) || [];
+    
+    // Si no hay historial, simular algunos jugadores de ejemplo
+    if (historial.length === 0) {
+        historial = [
+            { nombre: 'Caballero', puntuacion: 350, monedas: 200 },
+            { nombre: 'Mago', puntuacion: 280, monedas: 150 },
+            { nombre: 'Arquero', puntuacion: 220, monedas: 100 }
+        ];
+        localStorage.setItem('historialJugadores', JSON.stringify(historial));
+    }
+    
+    // Ordenar por puntuación (mayor a menor)
+    historial.sort((a, b) => b.puntuacion - a.puntuacion);
+    
+    // Limpiar tabla
+    tbody.innerHTML = '';
+    
+    // Crear filas para cada jugador
+    historial.forEach((jugadorHist, index) => {
+        const tr = document.createElement('tr');
+        
+        // Marcar al jugador actual (el último añadido con el mismo nombre y puntuación)
+        if (jugadorHist.nombre === jugador.nombre && 
+            jugadorHist.puntuacion === jugador.puntos && 
+            jugadorHist.monedas === jugador.dinero) {
+            tr.classList.add('jugador-actual');
+        }
+        
+        tr.innerHTML = `
+            <td>${jugadorHist.nombre}</td>
+            <td>${jugadorHist.puntuacion}</td>
+            <td>${formatearPrecio(jugadorHist.monedas)}</td>
+        `;
+        
+        tbody.appendChild(tr);
+    });
+    
+    console.log('Historial mostrado:', historial.length, 'jugadores');
+}
+
+/**
+ * Carga y muestra el historial de jugadores en la escena 8 (Ranking)
+ * Con número de posición en la tabla
+ * @returns {void}
+ */
+function loadHistorial() {
+    const tbody = document.getElementById('historial-tbody');
+    if (!tbody) return;
+    
+    // Obtener historial de LocalStorage
+    let historial = JSON.parse(localStorage.getItem('historialJugadores')) || [];
+    
+    // Si no hay historial, crear jugadores de ejemplo
+    if (historial.length === 0) {
+        historial = [
+            { nombre: 'Caballero', puntuacion: 350, monedas: 200 },
+            { nombre: 'Mago', puntuacion: 280, monedas: 150 },
+            { nombre: 'Arquero', puntuacion: 220, monedas: 100 },
+            { nombre: 'Guerrero', puntuacion: 180, monedas: 80 },
+            { nombre: 'Druida', puntuacion: 150, monedas: 120 },
+            { nombre: 'Bárbaro', puntuacion: 120, monedas: 50 },
+            { nombre: 'Paladín', puntuacion: 100, monedas: 90 },
+            { nombre: 'Asesino', puntuacion: 80, monedas: 60 }
+        ];
+        localStorage.setItem('historialJugadores', JSON.stringify(historial));
+    }
+    
+    // Ordenar por puntuación (mayor a menor)
+    historial.sort((a, b) => b.puntuacion - a.puntuacion);
+    
+    // Limpiar tabla
+    tbody.innerHTML = '';
+    
+    // Crear filas para cada jugador con posición
+    historial.forEach((jugadorHist, index) => {
+        const tr = document.createElement('tr');
+        
+        // Marcar al jugador actual
+        if (jugador && jugadorHist.nombre === jugador.nombre && 
+            jugadorHist.puntuacion === jugador.puntos && 
+            jugadorHist.monedas === jugador.dinero) {
+            tr.classList.add('jugador-actual');
+        }
+        
+        // Medallas para top 3
+        let posicion = index + 1;
+        let posicionDisplay = '';
+        if (index === 0) posicionDisplay = '🥇';
+        else if (index === 1) posicionDisplay = '🥈';
+        else if (index === 2) posicionDisplay = '🥉';
+        else posicionDisplay = posicion;
+        
+        tr.innerHTML = `
+            <td>${posicionDisplay}</td>
+            <td>${jugadorHist.nombre}</td>
+            <td>${jugadorHist.puntuacion}</td>
+            <td>${formatearPrecio(jugadorHist.monedas)}</td>
+        `;
+        
+        tbody.appendChild(tr);
+    });
+    
+    console.log('Ranking cargado:', historial.length, 'jugadores');
 }
 
 // === FUNCIÓN PARA REINICIAR EL JUEGO ===
@@ -1147,3 +1349,43 @@ function showFallingCoins() {
 
 // Exponer función globalmente para poder usarla
 window.showFallingCoins = showFallingCoins;
+
+/**
+ * Valida el nombre del jugador en tiempo real
+ * - Solo permite letras (incluidas acentuadas) y espacios
+ * - Primera letra debe ser mayúscula
+ * - Máximo 20 caracteres
+ * - No permite solo espacios en blanco
+ * @param {HTMLInputElement} input - El elemento input del nombre
+ */
+function validarNombre(input) {
+    let valor = input.value;
+    
+    // Eliminar caracteres no permitidos (solo letras y espacios)
+    valor = valor.replace(/[^a-záéíóúñA-ZÁÉÍÓÚÑ\s]/g, '');
+    
+    // Si hay contenido, asegurar que la primera letra sea mayúscula
+    if (valor.length > 0) {
+        valor = valor.charAt(0).toUpperCase() + valor.slice(1);
+    }
+    
+    // Limitar a 20 caracteres
+    if (valor.length > 20) {
+        valor = valor.substring(0, 20);
+    }
+    
+    // Actualizar el valor del input
+    input.value = valor;
+    
+    // Validar que no sea solo espacios en blanco
+    if (valor.trim().length === 0 && valor.length > 0) {
+        input.setCustomValidity('El nombre no puede contener solo espacios');
+    } else if (valor.length === 0) {
+        input.setCustomValidity('El nombre es obligatorio');
+    } else {
+        input.setCustomValidity('');
+    }
+}
+
+// Exponer función globalmente para el evento oninput del HTML
+window.validarNombre = validarNombre;

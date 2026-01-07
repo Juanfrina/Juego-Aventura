@@ -42,10 +42,10 @@ export class Jugadores {
      */
     inventario = [];
     /**
-     * Dinero del jugador en céntimos (1000€ = 100000 céntimos)
+     * Dinero del jugador en monedas (número entero)
      * @type {number}
      */
-    dinero = 50000; // 500€ en céntimos
+    dinero = 500; // 500 monedas
     /**
      * Constructor de la clase Jugadores
      * @param {string} nombre - Nombre del jugador
@@ -58,11 +58,11 @@ export class Jugadores {
         this.ataqueBase = 0;
         this.defensaBase = 0;
         this.inventario = [];
-        this.dinero = 50000; // 500€ en céntimos
+        this.dinero = 500; // 500 monedas
     }
     /**
      * Gasta dinero del jugador si tiene suficiente
-     * @param {number} cantidad - Cantidad a gastar en céntimos
+     * @param {number} cantidad - Cantidad a gastar en monedas
      * @returns {boolean} True si la compra fue exitosa, false si no tiene suficiente dinero
      */
     gastarDinero(cantidad) {
